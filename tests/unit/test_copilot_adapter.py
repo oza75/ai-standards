@@ -106,7 +106,7 @@ def test_reviewer_agent_has_persona_body() -> None:
         assert body.strip()
 
 
-def test_deploys_all_skill_prompts() -> None:
+def test_deploys_all_skills() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
@@ -118,12 +118,12 @@ def test_deploys_all_skill_prompts() -> None:
         )
 
         for name in _SKILLS:
-            assert (
-                project_dir / ".github" / "prompts" / f"{name}.prompt.md"
-            ).exists(), f"Missing .github/prompts/{name}.prompt.md"
+            assert (project_dir / ".github" / "skills" / name / "SKILL.md").exists(), (
+                f"Missing .github/skills/{name}/SKILL.md"
+            )
 
 
-def test_skill_prompt_content_matches() -> None:
+def test_skill_content_matches() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
@@ -135,14 +135,14 @@ def test_skill_prompt_content_matches() -> None:
         )
 
         for name, files in _SKILLS.items():
-            text = (
-                project_dir / ".github" / "prompts" / f"{name}.prompt.md"
-            ).read_text(encoding="utf-8")
-            assert text == files["SKILL.md"]
+            for inner, content in files.items():
+                text = (project_dir / ".github" / "skills" / name / inner).read_text(
+                    encoding="utf-8"
+                )
+                assert text == content
 
 
-def test_supporting_files_are_not_deployed() -> None:
-    # Copilot prompts are single files; supporting files have nowhere to go.
+def test_deploys_supporting_files() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
@@ -153,13 +153,13 @@ def test_supporting_files_are_not_deployed() -> None:
             skills=_SKILLS,
         )
 
-        prompt_files = sorted(
-            p.name for p in (project_dir / ".github" / "prompts").iterdir()
-        )
-        assert prompt_files == [
-            "review.prompt.md",
-            "test-driven-development.prompt.md",
-        ]
+        assert (
+            project_dir
+            / ".github"
+            / "skills"
+            / "test-driven-development"
+            / "testing-anti-patterns.md"
+        ).exists()
 
 
 def test_gitignore_not_touched() -> None:
@@ -189,10 +189,7 @@ def test_rerun_overwrites_cleanly() -> None:
         paths = [
             project_dir / ".github" / "copilot-instructions.md",
             project_dir / ".github" / "agents" / "reviewer.agent.md",
-        ] + [
-            project_dir / ".github" / "prompts" / f"{name}.prompt.md"
-            for name in _SKILLS
-        ]
+        ] + [project_dir / ".github" / "skills" / name / "SKILL.md" for name in _SKILLS]
         first = {str(p): p.read_bytes() for p in paths}
 
         CopilotAdapter.run(
@@ -220,4 +217,4 @@ def test_returns_written_paths() -> None:
         assert ".github/copilot-instructions.md" in result
         assert ".github/agents/reviewer.agent.md" in result
         for name in _SKILLS:
-            assert f".github/prompts/{name}.prompt.md" in result
+            assert f".github/skills/{name}/SKILL.md" in result

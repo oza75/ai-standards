@@ -41,7 +41,7 @@ _EXPECTED_DEPLOYED_FILES = (
     + [f".claude/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [f".cursor/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
-    + [f".github/prompts/{n}.prompt.md" for n in _SKILL_NAMES]
+    + [f".github/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
 )
 
 # Entries that must appear in .gitignore
@@ -50,7 +50,7 @@ _EXPECTED_GITIGNORE_ENTRIES = (
     + [f".claude/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [f".cursor/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
-    + [f".github/prompts/{n}.prompt.md" for n in _SKILL_NAMES]
+    + [f".github/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
 )
 
 
@@ -167,5 +167,5 @@ def test_init_deploys_skills_to_all_three_tools() -> None:
             project_dir / ".cursor" / "skills" / "test-driven-development" / "SKILL.md"
         ).exists()
         assert (
-            project_dir / ".github" / "prompts" / "test-driven-development.prompt.md"
+            project_dir / ".github" / "skills" / "test-driven-development" / "SKILL.md"
         ).exists()

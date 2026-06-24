@@ -29,15 +29,17 @@ class CopilotAdapter:
             ".github/agents/reviewer.agent.md",
         ]
 
-        # Copilot prompts are single files, so only the skill's SKILL.md is
-        # deployed. Supporting files (progressive-disclosure references) have no
-        # home in the .prompt.md format and are dropped for this tool.
-        prompts_dir = github_dir / "prompts"
-        prompts_dir.mkdir(parents=True, exist_ok=True)
+        # Copilot supports the cross-tool Agent Skills standard: multi-file
+        # SKILL.md skills under .github/skills/<name>/, model-invoked by their
+        # description, with supporting files loaded on demand. Deploy the whole
+        # skill directory, same as Claude Code and Cursor.
+        skills_root = github_dir / "skills"
         for name, files in skills.items():
-            (prompts_dir / f"{name}.prompt.md").write_text(
-                files["SKILL.md"], encoding="utf-8"
-            )
-            written.append(f".github/prompts/{name}.prompt.md")
+            skill_dir = skills_root / name
+            for inner, content in files.items():
+                dest = skill_dir / inner
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_text(content, encoding="utf-8")
+                written.append(f".github/skills/{name}/{inner}")
 
         return written
