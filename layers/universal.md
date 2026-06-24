@@ -40,6 +40,15 @@ a **class**.
 - Do **not** wrap a single stateless function in a class for its own sake. A pure
   transform with no state is a function.
 
+## Craft
+
+No on-the-fly, half-finished, or "simplified-to-pass" code. If something is worth
+writing, it is written to standard the first time — not patched in later. A quick
+experiment lives inline (a one-off command) or under a dedicated `scripts/` directory,
+never scattered through the source. Reviews and research are **loops, not one pass**, and
+prompts to a reviewer are **neutral** — state the artifact and ask what is wrong, never
+state the answer you hope for (a leading prompt produces confirmation, not signal).
+
 ## Tests
 
 Plan the tests and have the reviewer challenge them **before** writing them. Then drive
