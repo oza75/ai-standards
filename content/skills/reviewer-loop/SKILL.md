@@ -9,13 +9,22 @@ description: Review is a loop, not one pass — run review with claude-opus-4-8 
 address → re-review → repeat until a full pass yields **no new CRITICAL or MAJOR
 findings**. One clean-looking pass is never "done" — it can be a fluke.
 
-This skill wraps the `review` skill with the loop discipline. Always review with
-**claude-opus-4-8**.
+This skill wraps the `review` skill with the loop discipline. Each pass runs as
+an **independent reviewer**, always on **claude-opus-4-8**:
+
+- On **Claude Code**, delegate each pass to the `code-reviewer` subagent (defined
+  in `.claude/agents/`) — it is read-only, runs on claude-opus-4-8, and applies
+  the `review` skill in an isolated context.
+- On **GitHub Copilot**, use the `reviewer` custom agent (`.github/agents/`).
+- On **Cursor** (no file-based subagent), run the `review` skill directly.
+
+Running review in a separate agent matters: a fresh context with no stake in the
+implementation reviews the change on its own terms.
 
 ## The loop
 
-1. Run a `review` pass — give the reviewer the artifact and the acceptance
-   criteria (or the story set / plan in scope).
+1. Run a review pass — hand the reviewer the change in scope and the acceptance
+   criteria (or the story set / plan being reviewed).
 2. Separate **new findings this round** from ones already raised.
 3. If any CRITICAL or MAJOR findings exist: address every one, then return to
    step 1.

@@ -35,6 +35,8 @@ def test_manifest_lists_all_content_files() -> None:
         "content/skills/reviewer-loop/SKILL.md",
         "content/skills/verification-before-completion/SKILL.md",
         "content/skills/systematic-debugging/SKILL.md",
+        "content/skills/implement-story/SKILL.md",
+        "content/claude/agents/code-reviewer.md",
         "content/copilot/agents/reviewer.agent.md",
     ):
         assert expected in m.files, f"manifest missing: {expected}"

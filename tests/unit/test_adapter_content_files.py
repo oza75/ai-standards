@@ -89,6 +89,15 @@ def test_reviewer_agent_tools_are_verified_list() -> None:
     assert fm.get("tools") == REVIEWER_AGENT_TOOLS
 
 
+def test_claude_code_reviewer_subagent_is_read_only_opus() -> None:
+    path = CONTENT_DIR / "claude" / "agents" / "code-reviewer.md"
+    fm = _parse_frontmatter(path)
+    assert fm.get("name") == "code-reviewer"
+    assert fm.get("model") == "claude-opus-4-8"
+    tools = str(fm.get("tools", "")).lower()
+    assert "write" not in tools and "edit" not in tools, "reviewer must be read-only"
+
+
 def test_all_skill_files_are_utf8() -> None:
     for name in SKILL_NAMES:
         (CONTENT_DIR / "skills" / name / "SKILL.md").read_text(encoding="utf-8")

@@ -38,7 +38,7 @@ _SKILL_INNER = {
 
 # Files that must exist on disk after init
 _EXPECTED_DEPLOYED_FILES = (
-    ["AGENTS.md", "CLAUDE.local.md"]
+    ["AGENTS.md", "CLAUDE.local.md", ".claude/agents/code-reviewer.md"]
     + [f".claude/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [f".cursor/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
@@ -47,7 +47,7 @@ _EXPECTED_DEPLOYED_FILES = (
 
 # Entries that must appear in .gitignore
 _EXPECTED_GITIGNORE_ENTRIES = (
-    ["AGENTS.md", "CLAUDE.local.md"]
+    ["AGENTS.md", "CLAUDE.local.md", ".claude/agents/code-reviewer.md"]
     + [f".claude/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [f".cursor/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]

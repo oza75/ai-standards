@@ -16,6 +16,10 @@ _SKILLS = {
         "SKILL.md": "---\nname: review\ndescription: Review code.\n---\n\n# Review\n",
     },
 }
+_REVIEWER_AGENT = (
+    "---\nname: code-reviewer\ntools: Read, Grep, Glob, Bash\n"
+    "model: claude-opus-4-8\nskills: review\n---\n\n# code-reviewer\n"
+)
 
 
 def test_does_not_write_agents_md() -> None:
@@ -146,6 +150,45 @@ def test_returns_claude_local_and_skill_paths() -> None:
         assert "CLAUDE.local.md" in result
         for name in _SKILLS:
             assert f".claude/skills/{name}/SKILL.md" in result
+
+
+def test_deploys_reviewer_subagent() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        ClaudeCodeAdapter.run(
+            project_dir,
+            {"universal": _UNIVERSAL},
+            _SKILLS,
+            reviewer_agent=_REVIEWER_AGENT,
+        )
+
+        agent = project_dir / ".claude" / "agents" / "code-reviewer.md"
+        assert agent.exists()
+        assert agent.read_text(encoding="utf-8") == _REVIEWER_AGENT
+
+
+def test_reviewer_subagent_in_return_paths() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        result = ClaudeCodeAdapter.run(
+            project_dir,
+            {"universal": _UNIVERSAL},
+            _SKILLS,
+            reviewer_agent=_REVIEWER_AGENT,
+        )
+
+        assert ".claude/agents/code-reviewer.md" in result
+
+
+def test_no_reviewer_subagent_when_omitted() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
+
+        assert not (project_dir / ".claude" / "agents").exists()
 
 
 def test_does_not_touch_committed_claude_md() -> None:

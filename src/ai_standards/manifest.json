@@ -15,6 +15,7 @@
     "content/skills/systematic-debugging/SKILL.md",
     "content/skills/systematic-debugging/root-cause-tracing.md",
     "content/skills/systematic-debugging/defense-in-depth.md",
+    "content/claude/agents/code-reviewer.md",
     "content/copilot/agents/reviewer.agent.md"
   ]
 }

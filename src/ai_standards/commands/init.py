@@ -34,17 +34,22 @@ def run(
     layers = store.assemble_layers(languages)
     skills = store.get_skills()
 
+    claude_reviewer = store.get_content("content/claude/agents/code-reviewer.md")
+    copilot_reviewer = store.get_content("content/copilot/agents/reviewer.agent.md")
+
     written: list[str] = []
     written.extend(SharedAdapter.run(project_dir, layers))
-    written.extend(ClaudeCodeAdapter.run(project_dir, layers, skills))
+    written.extend(
+        ClaudeCodeAdapter.run(
+            project_dir, layers, skills, reviewer_agent=claude_reviewer
+        )
+    )
     written.extend(CursorAdapter.run(project_dir, layers, skills))
     written.extend(
         CopilotAdapter.run(
             project_dir,
             layers,
-            reviewer_agent=store.get_content(
-                "content/copilot/agents/reviewer.agent.md"
-            ),
+            reviewer_agent=copilot_reviewer,
             skills=skills,
         )
     )

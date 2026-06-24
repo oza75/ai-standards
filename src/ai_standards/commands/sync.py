@@ -31,7 +31,12 @@ def run(
     skills = store.get_skills()
 
     SharedAdapter.run(project_dir, layers)
-    ClaudeCodeAdapter.run(project_dir, layers, skills)
+    ClaudeCodeAdapter.run(
+        project_dir,
+        layers,
+        skills,
+        reviewer_agent=store.get_content("content/claude/agents/code-reviewer.md"),
+    )
     CursorAdapter.run(project_dir, layers, skills)
     CopilotAdapter.run(
         project_dir,
