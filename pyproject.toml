@@ -22,7 +22,9 @@ packages = ["src/ai_standards"]
 dev = [
     "mypy>=1.10",
     "pytest>=8.2",
+    "pyyaml>=6.0",
     "ruff>=0.4",
+    "types-pyyaml>=6.0",
 ]
 
 [tool.mypy]
