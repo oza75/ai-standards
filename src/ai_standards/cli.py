@@ -4,6 +4,7 @@ from pathlib import Path
 import typer
 
 from ai_standards.commands import init as init_cmd
+from ai_standards.commands import sync as sync_cmd
 from ai_standards.installer import Installer
 from ai_standards.manifest import ManifestError, load_manifest
 
@@ -55,4 +56,13 @@ def init(
     ref = importlib.resources.files("ai_standards") / "manifest.json"
     with importlib.resources.as_file(ref) as manifest_path:
         init_cmd.run(Path.cwd(), _STORE_DIR, manifest_path, flags)
+    typer.echo("Done.")
+
+
+@app.command()
+def sync() -> None:
+    """Re-deploy all adapter files from ~/.ai-standards/ to the current project."""
+    ref = importlib.resources.files("ai_standards") / "manifest.json"
+    with importlib.resources.as_file(ref) as manifest_path:
+        sync_cmd.run(Path.cwd(), _STORE_DIR, manifest_path)
     typer.echo("Done.")
