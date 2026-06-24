@@ -5,6 +5,7 @@ import typer
 
 from ai_standards.commands import init as init_cmd
 from ai_standards.commands import sync as sync_cmd
+from ai_standards.commands import update as update_cmd
 from ai_standards.installer import Installer
 from ai_standards.manifest import ManifestError, load_manifest
 
@@ -65,4 +66,13 @@ def sync() -> None:
     ref = importlib.resources.files("ai_standards") / "manifest.json"
     with importlib.resources.as_file(ref) as manifest_path:
         sync_cmd.run(Path.cwd(), _STORE_DIR, manifest_path)
+    typer.echo("Done.")
+
+
+@app.command()
+def update() -> None:
+    """Re-download canonical files from GitHub, then re-deploy to current project."""
+    ref = importlib.resources.files("ai_standards") / "manifest.json"
+    with importlib.resources.as_file(ref) as manifest_path:
+        update_cmd.run(Path.cwd(), _STORE_DIR, manifest_path)
     typer.echo("Done.")

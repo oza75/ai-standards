@@ -21,6 +21,23 @@ class Installer:
         staging = Path(str(store_dir) + ".staging")
         old_dir = Path(str(store_dir) + ".old")
 
+        # Recover from a prior crash during the rename phase.
+        # old_dir exists iff the first rename (store_dir -> old_dir) completed,
+        # meaning staging was fully downloaded before the crash.
+        if old_dir.exists():
+            if not store_dir.exists() and staging.exists():
+                # Crash between the two renames; staging is complete — finish the swap.
+                staging.rename(store_dir)
+                shutil.rmtree(old_dir)
+            elif not store_dir.exists():
+                # staging already moved to store_dir then old_dir cleanup crashed;
+                # but that would leave store_dir present — so this means staging is gone
+                # and first rename happened. Restore prior canonical.
+                old_dir.rename(store_dir)
+            else:
+                # store_dir swap succeeded; old_dir is leftover from cleanup crash.
+                shutil.rmtree(old_dir)
+
         if staging.exists():
             shutil.rmtree(staging)
 
@@ -37,8 +54,16 @@ class Installer:
             shutil.rmtree(staging, ignore_errors=True)
             raise
 
-        if store_dir.exists():
-            store_dir.rename(old_dir)
-        staging.rename(store_dir)
+        # Atomic swap: guard both renames so staging is cleaned on any failure.
+        try:
+            if store_dir.exists():
+                store_dir.rename(old_dir)
+            staging.rename(store_dir)
+        except Exception:
+            if old_dir.exists() and not store_dir.exists():
+                old_dir.rename(store_dir)
+            shutil.rmtree(staging, ignore_errors=True)
+            raise
+
         if old_dir.exists():
             shutil.rmtree(old_dir)

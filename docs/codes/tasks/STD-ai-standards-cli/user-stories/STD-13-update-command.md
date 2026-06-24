@@ -1,9 +1,9 @@
 ---
 code: STD-13
 title: "update command"
-status: pending
+status: done
 created: 2026-06-24T00:00:00
-completed: ~
+completed: 2026-06-24T00:00:00
 ---
 
 # STD-13 · `update` command
