@@ -58,11 +58,34 @@ def test_assembles_python_layer() -> None:
 
 def test_get_content_returns_file_text() -> None:
     store, _ = _make_store(_full_store_files())
-    text = store.get_content("content/cursor/skills/plan-task/SKILL.md")
-    assert text == "content of content/cursor/skills/plan-task/SKILL.md"
+    text = store.get_content("content/skills/plan-task/SKILL.md")
+    assert text == "content of content/skills/plan-task/SKILL.md"
 
 
 def test_content_not_in_layer_dict() -> None:
     store, _ = _make_store(_full_store_files())
     layers = store.assemble_layers({"python", "typescript"})
     assert not any(k.startswith("content/") for k in layers)
+
+
+def test_get_skills_returns_all_six() -> None:
+    store, _ = _make_store(_full_store_files())
+    skills = store.get_skills()
+    expected = {
+        "plan-task",
+        "review",
+        "test-driven-development",
+        "reviewer-loop",
+        "verification-before-completion",
+        "systematic-debugging",
+    }
+    assert set(skills.keys()) == expected
+
+
+def test_get_skills_values_are_nonempty_strings() -> None:
+    store, _ = _make_store(_full_store_files())
+    skills = store.get_skills()
+    for name, content in skills.items():
+        assert isinstance(content, str) and content, (
+            f"skill {name!r} has empty or non-string content"
+        )

@@ -29,10 +29,13 @@ def test_manifest_lists_all_layer_files() -> None:
 def test_manifest_lists_all_content_files() -> None:
     m = load_manifest(MANIFEST_PATH)
     for expected in (
-        "content/cursor/skills/plan-task/SKILL.md",
-        "content/cursor/skills/review/SKILL.md",
+        "content/skills/plan-task/SKILL.md",
+        "content/skills/review/SKILL.md",
+        "content/skills/test-driven-development/SKILL.md",
+        "content/skills/reviewer-loop/SKILL.md",
+        "content/skills/verification-before-completion/SKILL.md",
+        "content/skills/systematic-debugging/SKILL.md",
         "content/copilot/agents/reviewer.agent.md",
-        "content/copilot/prompts/review.prompt.md",
     ):
         assert expected in m.files, f"manifest missing: {expected}"
 

@@ -46,3 +46,16 @@ class CanonicalStore:
                 f"get_content path must start with 'content/': {relative_path!r}"
             )
         return (self._dir / relative_path).read_text(encoding="utf-8")
+
+    def get_skills(self) -> dict[str, str]:
+        result: dict[str, str] = {}
+        for rel in self._manifest.files:
+            parts = rel.split("/")
+            if (
+                len(parts) == 4
+                and parts[0] == "content"
+                and parts[1] == "skills"
+                and parts[3] == "SKILL.md"
+            ):
+                result[parts[2]] = (self._dir / rel).read_text(encoding="utf-8")
+        return result
