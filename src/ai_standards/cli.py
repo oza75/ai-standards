@@ -3,6 +3,7 @@ from pathlib import Path
 
 import typer
 
+from ai_standards.commands import init as init_cmd
 from ai_standards.installer import Installer
 from ai_standards.manifest import ManifestError, load_manifest
 
@@ -35,3 +36,23 @@ def install() -> None:
         raise typer.Exit(1)
 
     typer.echo(f"Installed to {_STORE_DIR}")
+
+
+@app.command()
+def init(
+    python: bool = typer.Option(False, "--python", help="Force Python layer."),
+    typescript: bool = typer.Option(
+        False, "--typescript", help="Force TypeScript layer."
+    ),
+) -> None:
+    """Detect language, deploy all adapters, and update .gitignore."""
+    flags: set[str] = set()
+    if python:
+        flags.add("python")
+    if typescript:
+        flags.add("typescript")
+
+    ref = importlib.resources.files("ai_standards") / "manifest.json"
+    with importlib.resources.as_file(ref) as manifest_path:
+        init_cmd.run(Path.cwd(), _STORE_DIR, manifest_path, flags)
+    typer.echo("Done.")
