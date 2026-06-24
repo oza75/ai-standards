@@ -71,8 +71,9 @@ def test_manifest_paths_match_actual_files() -> None:
         p for p in manifest["files"] if p.startswith("content/skills/")
     }
     disk_skill_paths = {
-        f"content/skills/{p.parent.name}/SKILL.md"
-        for p in (CONTENT_DIR / "skills").glob("*/SKILL.md")
+        "content/skills/" + p.relative_to(CONTENT_DIR / "skills").as_posix()
+        for p in (CONTENT_DIR / "skills").rglob("*")
+        if p.is_file()
     }
     assert manifest_skill_paths == disk_skill_paths, (
         f"Manifest and disk disagree.\n"

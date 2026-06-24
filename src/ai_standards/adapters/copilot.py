@@ -12,7 +12,7 @@ class CopilotAdapter:
         project_dir: Path,
         layers: dict[str, str],
         reviewer_agent: str,
-        skills: dict[str, str],
+        skills: dict[str, dict[str, str]],
     ) -> list[str]:
         github_dir = project_dir / ".github"
 
@@ -29,10 +29,15 @@ class CopilotAdapter:
             ".github/agents/reviewer.agent.md",
         ]
 
+        # Copilot prompts are single files, so only the skill's SKILL.md is
+        # deployed. Supporting files (progressive-disclosure references) have no
+        # home in the .prompt.md format and are dropped for this tool.
         prompts_dir = github_dir / "prompts"
         prompts_dir.mkdir(parents=True, exist_ok=True)
-        for name, content in skills.items():
-            (prompts_dir / f"{name}.prompt.md").write_text(content, encoding="utf-8")
+        for name, files in skills.items():
+            (prompts_dir / f"{name}.prompt.md").write_text(
+                files["SKILL.md"], encoding="utf-8"
+            )
             written.append(f".github/prompts/{name}.prompt.md")
 
         return written

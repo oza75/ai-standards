@@ -47,15 +47,21 @@ class CanonicalStore:
             )
         return (self._dir / relative_path).read_text(encoding="utf-8")
 
-    def get_skills(self) -> dict[str, str]:
-        result: dict[str, str] = {}
+    def get_skills(self) -> dict[str, dict[str, str]]:
+        """Return every shared skill as {skill_name: {path_within_skill: content}}.
+
+        A skill is a directory under `content/skills/<name>/`; it always has a
+        `SKILL.md` and may carry supporting files (e.g. `testing-anti-patterns.md`)
+        for progressive disclosure. The inner key is the path relative to the
+        skill directory, so nested supporting files keep their structure.
+        """
+        result: dict[str, dict[str, str]] = {}
         for rel in self._manifest.files:
             parts = rel.split("/")
-            if (
-                len(parts) == 4
-                and parts[0] == "content"
-                and parts[1] == "skills"
-                and parts[3] == "SKILL.md"
-            ):
-                result[parts[2]] = (self._dir / rel).read_text(encoding="utf-8")
+            if len(parts) >= 4 and parts[0] == "content" and parts[1] == "skills":
+                skill_name = parts[2]
+                inner_path = "/".join(parts[3:])
+                result.setdefault(skill_name, {})[inner_path] = (
+                    self._dir / rel
+                ).read_text(encoding="utf-8")
         return result

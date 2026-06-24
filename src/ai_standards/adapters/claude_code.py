@@ -17,7 +17,7 @@ class ClaudeCodeAdapter:
     def run(
         project_dir: Path,
         layers: dict[str, str],
-        skills: dict[str, str],
+        skills: dict[str, dict[str, str]],
     ) -> list[str]:
         lang_layers = [layers[k] for k in sorted(k for k in layers if k != "universal")]
         parts: list[str] = ["@AGENTS.md"] + [p.rstrip() for p in lang_layers]
@@ -26,10 +26,12 @@ class ClaudeCodeAdapter:
         )
 
         written = ["CLAUDE.local.md"]
-        for name, content in skills.items():
+        for name, files in skills.items():
             skill_dir = project_dir / ".claude" / "skills" / name
-            skill_dir.mkdir(parents=True, exist_ok=True)
-            (skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
-            written.append(f".claude/skills/{name}/SKILL.md")
+            for inner, content in files.items():
+                dest = skill_dir / inner
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_text(content, encoding="utf-8")
+                written.append(f".claude/skills/{name}/{inner}")
 
         return written

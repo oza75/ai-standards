@@ -6,15 +6,17 @@ class CursorAdapter:
     def run(
         project_dir: Path,
         layers: dict[str, str],
-        skills: dict[str, str],
+        skills: dict[str, dict[str, str]],
     ) -> list[str]:
         written: list[str] = []
 
-        for name, content in skills.items():
+        for name, files in skills.items():
             skill_dir = project_dir / ".cursor" / "skills" / name
-            skill_dir.mkdir(parents=True, exist_ok=True)
-            (skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
-            written.append(f".cursor/skills/{name}/SKILL.md")
+            for inner, content in files.items():
+                dest = skill_dir / inner
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_text(content, encoding="utf-8")
+                written.append(f".cursor/skills/{name}/{inner}")
 
         if "python" in layers:
             rules_dir = project_dir / ".cursor" / "rules"

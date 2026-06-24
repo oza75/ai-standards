@@ -10,10 +10,17 @@ _REVIEWER_AGENT = (
     "---\nname: reviewer\ntools:\n  - read\n  - search\n---\n\n# Reviewer\n"
 )
 _SKILLS = {
-    "review": "---\nname: review\ndescription: Review code.\n---\n\n# Code Review\n",
-    "test-driven-development": (
-        "---\nname: test-driven-development\ndescription: TDD.\n---\n\n# TDD\n"
-    ),
+    "review": {
+        "SKILL.md": (
+            "---\nname: review\ndescription: Review code.\n---\n\n# Code Review\n"
+        ),
+    },
+    "test-driven-development": {
+        "SKILL.md": (
+            "---\nname: test-driven-development\ndescription: TDD.\n---\n\n# TDD\n"
+        ),
+        "testing-anti-patterns.md": "# Testing anti-patterns\n\nDo not test mocks.\n",
+    },
 }
 
 
@@ -127,11 +134,32 @@ def test_skill_prompt_content_matches() -> None:
             skills=_SKILLS,
         )
 
-        for name, skill_content in _SKILLS.items():
+        for name, files in _SKILLS.items():
             text = (
                 project_dir / ".github" / "prompts" / f"{name}.prompt.md"
             ).read_text(encoding="utf-8")
-            assert text == skill_content
+            assert text == files["SKILL.md"]
+
+
+def test_supporting_files_are_not_deployed() -> None:
+    # Copilot prompts are single files; supporting files have nowhere to go.
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        CopilotAdapter.run(
+            project_dir,
+            layers={"universal": _UNIVERSAL},
+            reviewer_agent=_REVIEWER_AGENT,
+            skills=_SKILLS,
+        )
+
+        prompt_files = sorted(
+            p.name for p in (project_dir / ".github" / "prompts").iterdir()
+        )
+        assert prompt_files == [
+            "review.prompt.md",
+            "test-driven-development.prompt.md",
+        ]
 
 
 def test_gitignore_not_touched() -> None:

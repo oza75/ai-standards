@@ -8,13 +8,20 @@ from ai_standards.adapters.cursor import CursorAdapter
 _UNIVERSAL = "# Universal\n\nUniversal coding standards.\n"
 _PYTHON = "# Python\n\nPython-specific standards.\n"
 _SKILLS = {
-    "plan-task": (
-        "---\nname: plan-task\ndescription: Plan a task.\n---\n\n# plan-task\n"
-    ),
-    "review": "---\nname: review\ndescription: Review code.\n---\n\n# review\n",
-    "test-driven-development": (
-        "---\nname: test-driven-development\ndescription: TDD.\n---\n\n# TDD\n"
-    ),
+    "plan-task": {
+        "SKILL.md": (
+            "---\nname: plan-task\ndescription: Plan a task.\n---\n\n# plan-task\n"
+        ),
+    },
+    "review": {
+        "SKILL.md": "---\nname: review\ndescription: Review code.\n---\n\n# review\n",
+    },
+    "test-driven-development": {
+        "SKILL.md": (
+            "---\nname: test-driven-development\ndescription: TDD.\n---\n\n# TDD\n"
+        ),
+        "testing-anti-patterns.md": "# Testing anti-patterns\n\nDo not test mocks.\n",
+    },
 }
 
 
@@ -103,11 +110,27 @@ def test_skill_content_matches() -> None:
 
         CursorAdapter.run(project_dir, layers={"universal": _UNIVERSAL}, skills=_SKILLS)
 
-        for name, content in _SKILLS.items():
-            text = (project_dir / ".cursor" / "skills" / name / "SKILL.md").read_text(
-                encoding="utf-8"
-            )
-            assert text == content
+        for name, files in _SKILLS.items():
+            for inner, content in files.items():
+                text = (project_dir / ".cursor" / "skills" / name / inner).read_text(
+                    encoding="utf-8"
+                )
+                assert text == content
+
+
+def test_deploys_supporting_files() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        CursorAdapter.run(project_dir, layers={"universal": _UNIVERSAL}, skills=_SKILLS)
+
+        assert (
+            project_dir
+            / ".cursor"
+            / "skills"
+            / "test-driven-development"
+            / "testing-anti-patterns.md"
+        ).exists()
 
 
 def test_gitignore_not_touched() -> None:

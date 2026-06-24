@@ -23,11 +23,23 @@ _SKILL_NAMES = [
     "systematic-debugging",
 ]
 
+# Supporting (progressive-disclosure) files per skill, relative to the skill dir.
+# These deploy to Claude Code and Cursor but NOT to Copilot (single .prompt.md).
+_SUPPORTING_FILES = {
+    "test-driven-development": ["testing-anti-patterns.md"],
+    "systematic-debugging": ["root-cause-tracing.md", "defense-in-depth.md"],
+}
+
+# Every file within each skill, relative to the skill dir (SKILL.md + supporting).
+_SKILL_INNER = {
+    name: ["SKILL.md", *_SUPPORTING_FILES.get(name, [])] for name in _SKILL_NAMES
+}
+
 # Files that must exist on disk after init
 _EXPECTED_DEPLOYED_FILES = (
     ["AGENTS.md", "CLAUDE.local.md"]
-    + [f".claude/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
-    + [f".cursor/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
+    + [f".claude/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
+    + [f".cursor/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
     + [f".github/prompts/{n}.prompt.md" for n in _SKILL_NAMES]
 )
@@ -35,8 +47,8 @@ _EXPECTED_DEPLOYED_FILES = (
 # Entries that must appear in .gitignore
 _EXPECTED_GITIGNORE_ENTRIES = (
     ["AGENTS.md", "CLAUDE.local.md"]
-    + [f".claude/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
-    + [f".cursor/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
+    + [f".claude/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
+    + [f".cursor/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
     + [f".github/prompts/{n}.prompt.md" for n in _SKILL_NAMES]
 )

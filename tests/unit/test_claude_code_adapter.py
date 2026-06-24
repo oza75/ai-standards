@@ -6,10 +6,15 @@ from ai_standards.adapters.claude_code import ClaudeCodeAdapter
 _UNIVERSAL = "# Universal\n\nUniversal coding standards."
 _PYTHON = "# Python\n\nPython-specific standards."
 _SKILLS = {
-    "test-driven-development": (
-        "---\nname: test-driven-development\ndescription: TDD.\n---\n\n# TDD\n"
-    ),
-    "review": "---\nname: review\ndescription: Review code.\n---\n\n# Review\n",
+    "test-driven-development": {
+        "SKILL.md": (
+            "---\nname: test-driven-development\ndescription: TDD.\n---\n\n# TDD\n"
+        ),
+        "testing-anti-patterns.md": "# Testing anti-patterns\n\nDo not test mocks.\n",
+    },
+    "review": {
+        "SKILL.md": "---\nname: review\ndescription: Review code.\n---\n\n# Review\n",
+    },
 }
 
 
@@ -108,11 +113,27 @@ def test_skill_content_matches() -> None:
 
         ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
 
-        for name, skill_content in _SKILLS.items():
-            text = (project_dir / ".claude" / "skills" / name / "SKILL.md").read_text(
-                encoding="utf-8"
-            )
-            assert text == skill_content
+        for name, files in _SKILLS.items():
+            for inner, content in files.items():
+                text = (project_dir / ".claude" / "skills" / name / inner).read_text(
+                    encoding="utf-8"
+                )
+                assert text == content
+
+
+def test_deploys_supporting_files() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
+
+        assert (
+            project_dir
+            / ".claude"
+            / "skills"
+            / "test-driven-development"
+            / "testing-anti-patterns.md"
+        ).exists()
 
 
 def test_returns_claude_local_and_skill_paths() -> None:

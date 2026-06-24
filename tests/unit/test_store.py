@@ -82,10 +82,20 @@ def test_get_skills_returns_all_six() -> None:
     assert set(skills.keys()) == expected
 
 
-def test_get_skills_values_are_nonempty_strings() -> None:
+def test_get_skills_each_skill_has_skill_md() -> None:
     store, _ = _make_store(_full_store_files())
     skills = store.get_skills()
-    for name, content in skills.items():
-        assert isinstance(content, str) and content, (
-            f"skill {name!r} has empty or non-string content"
-        )
+    for name, files in skills.items():
+        assert "SKILL.md" in files, f"skill {name!r} missing SKILL.md"
+        for inner, content in files.items():
+            assert isinstance(content, str) and content, (
+                f"skill {name!r} file {inner!r} has empty or non-string content"
+            )
+
+
+def test_get_skills_includes_supporting_files() -> None:
+    store, _ = _make_store(_full_store_files())
+    skills = store.get_skills()
+    assert "testing-anti-patterns.md" in skills["test-driven-development"]
+    assert "root-cause-tracing.md" in skills["systematic-debugging"]
+    assert "defense-in-depth.md" in skills["systematic-debugging"]
