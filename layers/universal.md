@@ -1,33 +1,70 @@
 # Universal AI Coding Standards
 
-Personal coding standards applied across all projects and languages.
+The single source of truth for how code is written. These are principles to reason from,
+not a checklist to pattern-match.
 
 ## Naming
 
-- Names reveal intent; avoid abbreviations unless universally known (`url`, `id`, `ctx`).
-- Boolean names start with `is_`, `has_`, or `can_` (`is_valid`, `has_children`).
-- Functions and methods are verbs or verb phrases (`get_user`, `validate_input`).
-- Avoid generic names: `data`, `info`, `result`, `temp`, `x` — name what it represents.
+Names state intent in full. A reader should infer purpose from the name alone, without
+the surrounding code or conversation.
+
+- Bad: `K`, `mt`, `df2`, `tmp`, `do_it()`, `data2`. These hide intent.
+- Good: `beam_width`, `model_tokenizer`, `aligned_pairs`, `compute_edit_labels()`,
+  `detection_logits`, `keep_ratio`.
+- No abbreviations that are not already domain vocabulary. `edit_distance`, not `ed`.
 
 ## Docs
 
-- Write no comments by default. Add one only when the WHY is non-obvious: a hidden
-  constraint, a subtle invariant, or a workaround for a specific bug.
-- Never describe WHAT the code does (well-named identifiers already do that).
-- Public API functions get a one-line summary only if the name alone is insufficient.
-- No multi-line docblocks for internal helpers.
+Write the code first and get it correct. Then make a **separate pass** to add docstrings
+and comments. Writing both at once produces narration that drifts from the code.
+
+- They explain the **why / business logic**, never restate the **what**. Anyone can read
+  the code; the reason behind it is what needs recording.
+- They are written for a future reader who has **no access to this conversation**. Never
+  use a docstring or comment to address the user or narrate a decision — record the logic.
+- No banner / divider comments (`# ----- section -----`). Delete them on sight.
+- A docstring that just repeats the signature adds nothing — omit it or explain the logic.
+- **Multi-line form always:** opening `"""` on its own line, content indented, closing
+  `"""` on its own line — even for a single sentence. Never use the inline form
+  `"""one-liner"""`.
+
+## Structure
+
+Single responsibility per unit. Group related behaviour and the state it operates on into
+a **class**.
+
+- Model variants with an **abstract base class** — e.g. `Serializer(ABC)` →
+  `JsonSerializer`, `CsvSerializer`.
+- **Composition is the default for reuse**; inheritance is for genuine polymorphic
+  contracts, not for sharing code. Avoid deep hierarchies.
+- Do **not** wrap a single stateless function in a class for its own sake. A pure
+  transform with no state is a function.
 
 ## Tests
 
-- Tests are the first code written (TDD). Write a failing test before any production code.
-- Each test asserts one behaviour. Name tests `test_<what>_<condition>_<expected>`.
-- No mocking of things you own — prefer real objects or fakes over mocks.
-- Test the contract (inputs/outputs), not the implementation details.
-- Every edge case that caused a bug gets a regression test.
+Plan the tests and have the reviewer challenge them **before** writing them. Then drive
+the code test-first.
+
+- **Unit** tests for isolated logic; **functional** tests for an end-to-end scenario.
+- **Arrange–Act–Assert**, with a blank line separating the three segments.
+- Each test has a **docstring** (multi-line form, per the Docs rule) stating the logic
+  under test — the scenario and expected behaviour, not a description of the code.
+- Test names state the scenario: `test_already_correct_input_is_left_unchanged`,
+  not `test_1`.
+- **Value over coverage.** Test behaviour that can break and matters; do not assert the
+  framework or trivially-true facts.
+- **Match rigor to the surface.** Fully deterministic logic gets strict red-green TDD.
+  Nondeterministic or hard-to-pin surfaces are tested for mechanics and invariants —
+  shapes, round-trips, seeded reproducibility — not exact outputs.
+- A claim of success is backed by fresh command output, never by assumption.
 
 ## Git
 
-- Conventional Commits: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`.
-- One logical change per commit. Commits are not checkpoints — they are history.
-- Commit message subject ≤ 72 chars; imperative mood ("Add …", not "Added …").
-- Never amend or force-push commits that have been shared.
+Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+- **Message:** `<type>(<scope>): <subject>`, referencing the story code.
+  Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`,
+  `chore`, `revert`. Breaking change: `!` after the type/scope.
+- **Trailer:** `Co-Authored-By: Claude <model> <noreply@anthropic.com>`.
+- **Branch:** `<type>/<story-code>-<short-name>`, one branch per story, merged to `main`
+  when the story is done.
