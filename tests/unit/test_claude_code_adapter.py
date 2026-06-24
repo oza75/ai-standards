@@ -81,30 +81,41 @@ def test_import_and_language_layer_separated_by_one_blank_line() -> None:
         assert not after_import.startswith("\n\n\n"), "must not be two blank lines"
 
 
-def test_deploys_commands_for_all_skills() -> None:
+def test_deploys_skills_as_model_invocable_skills() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
         ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
 
         for name in _SKILLS:
-            assert (project_dir / ".claude" / "commands" / f"{name}.md").exists()
+            assert (project_dir / ".claude" / "skills" / name / "SKILL.md").exists(), (
+                f"Missing .claude/skills/{name}/SKILL.md"
+            )
 
 
-def test_command_content_matches_skill() -> None:
+def test_does_not_deploy_to_commands() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
+
+        assert not (project_dir / ".claude" / "commands").exists()
+
+
+def test_skill_content_matches() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
         ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
 
         for name, skill_content in _SKILLS.items():
-            cmd = (project_dir / ".claude" / "commands" / f"{name}.md").read_text(
+            text = (project_dir / ".claude" / "skills" / name / "SKILL.md").read_text(
                 encoding="utf-8"
             )
-            assert cmd == skill_content
+            assert text == skill_content
 
 
-def test_returns_claude_local_and_commands_dir() -> None:
+def test_returns_claude_local_and_skill_paths() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
@@ -112,7 +123,8 @@ def test_returns_claude_local_and_commands_dir() -> None:
 
         assert "AGENTS.md" not in result
         assert "CLAUDE.local.md" in result
-        assert ".claude/commands/" in result
+        for name in _SKILLS:
+            assert f".claude/skills/{name}/SKILL.md" in result
 
 
 def test_does_not_touch_committed_claude_md() -> None:
@@ -144,11 +156,13 @@ def test_rerun_overwrites_cleanly() -> None:
 
         ClaudeCodeAdapter.run(project_dir, layers, _SKILLS)
         claude_first = (project_dir / "CLAUDE.local.md").read_bytes()
-        cmd_first = (project_dir / ".claude" / "commands" / "review.md").read_bytes()
+        skill_first = (
+            project_dir / ".claude" / "skills" / "review" / "SKILL.md"
+        ).read_bytes()
 
         ClaudeCodeAdapter.run(project_dir, layers, _SKILLS)
 
         assert (project_dir / "CLAUDE.local.md").read_bytes() == claude_first
         assert (
-            project_dir / ".claude" / "commands" / "review.md"
-        ).read_bytes() == cmd_first
+            project_dir / ".claude" / "skills" / "review" / "SKILL.md"
+        ).read_bytes() == skill_first

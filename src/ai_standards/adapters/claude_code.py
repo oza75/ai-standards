@@ -4,8 +4,11 @@ from pathlib import Path
 class ClaudeCodeAdapter:
     """Deploys Claude Code's native files.
 
-    Claude Code reads `CLAUDE.local.md` (gitignored personal layer) and skills
-    under `.claude/commands/`. It does not read `AGENTS.md` natively, so the
+    Claude Code reads `CLAUDE.local.md` (gitignored personal layer) and Skills
+    under `.claude/skills/<name>/SKILL.md`. Skills are *model-invoked* — Claude
+    triggers them automatically from their `description`, which is what makes the
+    deployed workflow self-driving (unlike `.claude/commands/`, which only run
+    when the user types `/name`). It does not read `AGENTS.md` natively, so the
     universal layer is pulled in via the `@AGENTS.md` import directive on the
     first line of CLAUDE.local.md. `AGENTS.md` itself is written by SharedAdapter.
     """
@@ -22,9 +25,11 @@ class ClaudeCodeAdapter:
             "\n\n".join(parts) + "\n", encoding="utf-8"
         )
 
-        commands_dir = project_dir / ".claude" / "commands"
-        commands_dir.mkdir(parents=True, exist_ok=True)
+        written = ["CLAUDE.local.md"]
         for name, content in skills.items():
-            (commands_dir / f"{name}.md").write_text(content, encoding="utf-8")
+            skill_dir = project_dir / ".claude" / "skills" / name
+            skill_dir.mkdir(parents=True, exist_ok=True)
+            (skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
+            written.append(f".claude/skills/{name}/SKILL.md")
 
-        return ["CLAUDE.local.md", ".claude/commands/"]
+        return written

@@ -80,14 +80,28 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Workflow
 
-Every story follows the same lifecycle. Invoke the corresponding skill at each step.
+The workflow is a **loop**, run in **two phases**. Each phase has an entry skill the
+tool invokes automatically — you do not run the steps by hand. Neither phase is a
+straight line: each repeats until it converges.
 
-| Step | When | Skill |
-|------|------|-------|
-| Plan | Before writing any code | `plan-task` |
-| Implement | One story at a time | `test-driven-development` |
-| Verify | Before marking a story done | `verification-before-completion` |
-| Review | After verification passes | `reviewer-loop` |
-| Debug | When a test fails unexpectedly | `systematic-debugging` |
+**Planning phase — loop until the story set converges.** Driven by `plan-task`:
+propose the story set → `reviewer-loop` challenges the decomposition → revise →
+re-review, repeating until no CRITICAL/MAJOR remains. Only then write the story files,
+and run `reviewer-loop` once more on what was written. No code is written until this
+converges.
 
-The `review` skill runs a single pass inside `reviewer-loop`. Use `reviewer-loop` to reach convergence.
+**Coding phase — loop per story until done.** For each story, in dependency order:
+`test-driven-development` (red → green → refactor, one unit at a time, itself a loop) →
+`verification-before-completion` (the full gate green, with the behaviour observed) →
+`reviewer-loop` (repeat until no CRITICAL/MAJOR) → commit → next story.
+
+`systematic-debugging` is invoked whenever a test fails for a non-obvious reason — root
+cause before any fix.
+
+| Phase | Entry skill | Loops until |
+|-------|-------------|-------------|
+| Plan | `plan-task` | story set has no CRITICAL/MAJOR |
+| Code (per story) | `test-driven-development` → `verification-before-completion` → `reviewer-loop` | gate green and review converged |
+| Debug (as needed) | `systematic-debugging` | root cause found, regression test passes |
+
+`review` runs a single pass; `reviewer-loop` runs it to convergence.

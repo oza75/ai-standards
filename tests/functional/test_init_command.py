@@ -26,15 +26,16 @@ _SKILL_NAMES = [
 # Files that must exist on disk after init
 _EXPECTED_DEPLOYED_FILES = (
     ["AGENTS.md", "CLAUDE.local.md"]
-    + [f".claude/commands/{n}.md" for n in _SKILL_NAMES]
+    + [f".claude/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
     + [f".cursor/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
     + [f".github/prompts/{n}.prompt.md" for n in _SKILL_NAMES]
 )
 
-# Entries that must appear in .gitignore (ClaudeCode uses dir glob)
+# Entries that must appear in .gitignore
 _EXPECTED_GITIGNORE_ENTRIES = (
-    ["AGENTS.md", "CLAUDE.local.md", ".claude/commands/"]
+    ["AGENTS.md", "CLAUDE.local.md"]
+    + [f".claude/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
     + [f".cursor/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
     + [f".github/prompts/{n}.prompt.md" for n in _SKILL_NAMES]
@@ -148,7 +149,7 @@ def test_init_deploys_skills_to_all_three_tools() -> None:
         run(project_dir, STORE_DIR, MANIFEST_PATH, set())
 
         assert (
-            project_dir / ".claude" / "commands" / "test-driven-development.md"
+            project_dir / ".claude" / "skills" / "test-driven-development" / "SKILL.md"
         ).exists()
         assert (
             project_dir / ".cursor" / "skills" / "test-driven-development" / "SKILL.md"
