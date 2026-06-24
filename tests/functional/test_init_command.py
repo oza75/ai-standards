@@ -14,15 +14,31 @@ REPO_ROOT = Path(__file__).parent.parent.parent
 STORE_DIR = REPO_ROOT
 MANIFEST_PATH = REPO_ROOT / "layers" / "manifest.json"
 
-_EXPECTED_FILES = [
-    "CLAUDE.local.md",
-    "AGENTS.md",
-    ".cursor/skills/plan-task/SKILL.md",
-    ".cursor/skills/review/SKILL.md",
-    ".github/copilot-instructions.md",
-    ".github/agents/reviewer.agent.md",
-    ".github/prompts/review.prompt.md",
+_SKILL_NAMES = [
+    "plan-task",
+    "review",
+    "test-driven-development",
+    "reviewer-loop",
+    "verification-before-completion",
+    "systematic-debugging",
 ]
+
+# Files that must exist on disk after init
+_EXPECTED_DEPLOYED_FILES = (
+    ["AGENTS.md", "CLAUDE.local.md"]
+    + [f".claude/commands/{n}.md" for n in _SKILL_NAMES]
+    + [f".cursor/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
+    + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
+    + [f".github/prompts/{n}.prompt.md" for n in _SKILL_NAMES]
+)
+
+# Entries that must appear in .gitignore (ClaudeCode uses dir glob)
+_EXPECTED_GITIGNORE_ENTRIES = (
+    ["AGENTS.md", "CLAUDE.local.md", ".claude/commands/"]
+    + [f".cursor/skills/{n}/SKILL.md" for n in _SKILL_NAMES]
+    + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
+    + [f".github/prompts/{n}.prompt.md" for n in _SKILL_NAMES]
+)
 
 
 def test_init_creates_all_adapter_files() -> None:
@@ -31,7 +47,7 @@ def test_init_creates_all_adapter_files() -> None:
 
         run(project_dir, STORE_DIR, MANIFEST_PATH, set())
 
-        for rel in _EXPECTED_FILES:
+        for rel in _EXPECTED_DEPLOYED_FILES:
             assert (project_dir / rel).exists(), f"Missing: {rel}"
 
 
@@ -42,8 +58,8 @@ def test_init_gitignores_all_files() -> None:
         run(project_dir, STORE_DIR, MANIFEST_PATH, set())
 
         gitignore = (project_dir / ".gitignore").read_text(encoding="utf-8")
-        for rel in _EXPECTED_FILES:
-            assert rel in gitignore, f".gitignore missing: {rel}"
+        for entry in _EXPECTED_GITIGNORE_ENTRIES:
+            assert entry in gitignore, f".gitignore missing: {entry}"
 
 
 def test_init_python_flag_forces_python_layer() -> None:
@@ -92,11 +108,13 @@ def test_init_idempotent() -> None:
         project_dir = Path(tmp)
 
         run(project_dir, STORE_DIR, MANIFEST_PATH, {"python"})
-        files_first = {rel: (project_dir / rel).read_bytes() for rel in _EXPECTED_FILES}
+        files_first = {
+            rel: (project_dir / rel).read_bytes() for rel in _EXPECTED_DEPLOYED_FILES
+        }
         gitignore_first = (project_dir / ".gitignore").read_text(encoding="utf-8")
 
         run(project_dir, STORE_DIR, MANIFEST_PATH, {"python"})
-        for rel in _EXPECTED_FILES:
+        for rel in _EXPECTED_DEPLOYED_FILES:
             assert (project_dir / rel).read_bytes() == files_first[rel], (
                 f"Content changed on re-run: {rel}"
             )
@@ -121,3 +139,20 @@ def test_init_python_and_typescript_flags_together(
         captured = capsys.readouterr()
         assert "no adapter" in captured.out
         assert (project_dir / ".cursor" / "rules" / "python.mdc").exists()
+
+
+def test_init_deploys_skills_to_all_three_tools() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        run(project_dir, STORE_DIR, MANIFEST_PATH, set())
+
+        assert (
+            project_dir / ".claude" / "commands" / "test-driven-development.md"
+        ).exists()
+        assert (
+            project_dir / ".cursor" / "skills" / "test-driven-development" / "SKILL.md"
+        ).exists()
+        assert (
+            project_dir / ".github" / "prompts" / "test-driven-development.prompt.md"
+        ).exists()

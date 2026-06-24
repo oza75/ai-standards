@@ -72,7 +72,7 @@ def test_update_redeploys_files() -> None:
         _make_store(store_dir, b"old content")
         sync_run(project_dir, store_dir, manifest_path)
 
-        before = (project_dir / "CLAUDE.local.md").read_text(encoding="utf-8")
+        before = (project_dir / "AGENTS.md").read_text(encoding="utf-8")
         assert "old content" in before
 
         updated = b"updated canonical content"
@@ -82,7 +82,7 @@ def test_update_redeploys_files() -> None:
         ):
             run(project_dir, store_dir, manifest_path)
 
-        after = (project_dir / "CLAUDE.local.md").read_text(encoding="utf-8")
+        after = (project_dir / "AGENTS.md").read_text(encoding="utf-8")
         assert "updated canonical content" in after
 
 
@@ -166,5 +166,5 @@ def test_sync_still_works_after_failed_update() -> None:
 
         sync_run(project_dir, store_dir, manifest_path)
 
-        content = (project_dir / "CLAUDE.local.md").read_text(encoding="utf-8")
+        content = (project_dir / "AGENTS.md").read_text(encoding="utf-8")
         assert "prior canonical content" in content

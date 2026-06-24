@@ -1,9 +1,9 @@
 ---
 code: STD-15
 title: "adapters and orchestration — AGENTS.md, commands, shared skills"
-status: pending
+status: done
 created: 2026-06-24T00:00:00
-completed: ~
+completed: 2026-06-24T00:00:00
 ---
 
 # STD-15 · Adapters and orchestration — AGENTS.md, commands, shared skills

@@ -12,7 +12,7 @@ class CopilotAdapter:
         project_dir: Path,
         layers: dict[str, str],
         reviewer_agent: str,
-        review_prompt: str,
+        skills: dict[str, str],
     ) -> list[str]:
         github_dir = project_dir / ".github"
 
@@ -24,12 +24,15 @@ class CopilotAdapter:
         agents_dir.mkdir(parents=True, exist_ok=True)
         (agents_dir / "reviewer.agent.md").write_text(reviewer_agent, encoding="utf-8")
 
-        prompts_dir = github_dir / "prompts"
-        prompts_dir.mkdir(parents=True, exist_ok=True)
-        (prompts_dir / "review.prompt.md").write_text(review_prompt, encoding="utf-8")
-
-        return [
+        written: list[str] = [
             ".github/copilot-instructions.md",
             ".github/agents/reviewer.agent.md",
-            ".github/prompts/review.prompt.md",
         ]
+
+        prompts_dir = github_dir / "prompts"
+        prompts_dir.mkdir(parents=True, exist_ok=True)
+        for name, content in skills.items():
+            (prompts_dir / f"{name}.prompt.md").write_text(content, encoding="utf-8")
+            written.append(f".github/prompts/{name}.prompt.md")
+
+        return written

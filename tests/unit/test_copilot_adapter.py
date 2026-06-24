@@ -9,7 +9,12 @@ _UNIVERSAL = "# Universal\n\nUniversal coding standards.\n"
 _REVIEWER_AGENT = (
     "---\nname: reviewer\ntools:\n  - read\n  - search\n---\n\n# Reviewer\n"
 )
-_REVIEW_PROMPT = "---\nname: review\n---\n\n# Code Review\n"
+_SKILLS = {
+    "review": "---\nname: review\ndescription: Review code.\n---\n\n# Code Review\n",
+    "test-driven-development": (
+        "---\nname: test-driven-development\ndescription: TDD.\n---\n\n# TDD\n"
+    ),
+}
 
 
 def test_creates_copilot_instructions() -> None:
@@ -20,7 +25,7 @@ def test_creates_copilot_instructions() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
         assert (project_dir / ".github" / "copilot-instructions.md").exists()
@@ -34,7 +39,7 @@ def test_copilot_instructions_has_universal_content() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
         content = (project_dir / ".github" / "copilot-instructions.md").read_text(
@@ -51,7 +56,7 @@ def test_creates_reviewer_agent() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
         assert (project_dir / ".github" / "agents" / "reviewer.agent.md").exists()
@@ -65,7 +70,7 @@ def test_reviewer_agent_tools_are_verified_list() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
         text = (project_dir / ".github" / "agents" / "reviewer.agent.md").read_text(
@@ -84,7 +89,7 @@ def test_reviewer_agent_has_persona_body() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
         text = (project_dir / ".github" / "agents" / "reviewer.agent.md").read_text(
@@ -94,7 +99,7 @@ def test_reviewer_agent_has_persona_body() -> None:
         assert body.strip()
 
 
-def test_creates_review_prompt() -> None:
+def test_deploys_all_skill_prompts() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
@@ -102,13 +107,16 @@ def test_creates_review_prompt() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
-        assert (project_dir / ".github" / "prompts" / "review.prompt.md").exists()
+        for name in _SKILLS:
+            assert (
+                project_dir / ".github" / "prompts" / f"{name}.prompt.md"
+            ).exists(), f"Missing .github/prompts/{name}.prompt.md"
 
 
-def test_review_prompt_has_name() -> None:
+def test_skill_prompt_content_matches() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
@@ -116,15 +124,14 @@ def test_review_prompt_has_name() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
-        text = (project_dir / ".github" / "prompts" / "review.prompt.md").read_text(
-            encoding="utf-8"
-        )
-        _, fm_text, _ = text.split("---", 2)
-        fm = yaml.safe_load(fm_text)
-        assert fm.get("name") and isinstance(fm["name"], str)
+        for name, skill_content in _SKILLS.items():
+            text = (
+                project_dir / ".github" / "prompts" / f"{name}.prompt.md"
+            ).read_text(encoding="utf-8")
+            assert text == skill_content
 
 
 def test_gitignore_not_touched() -> None:
@@ -135,7 +142,7 @@ def test_gitignore_not_touched() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
         assert not (project_dir / ".gitignore").exists()
@@ -149,12 +156,14 @@ def test_rerun_overwrites_cleanly() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
         paths = [
             project_dir / ".github" / "copilot-instructions.md",
             project_dir / ".github" / "agents" / "reviewer.agent.md",
-            project_dir / ".github" / "prompts" / "review.prompt.md",
+        ] + [
+            project_dir / ".github" / "prompts" / f"{name}.prompt.md"
+            for name in _SKILLS
         ]
         first = {str(p): p.read_bytes() for p in paths}
 
@@ -162,7 +171,7 @@ def test_rerun_overwrites_cleanly() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
         for p in paths:
@@ -177,10 +186,10 @@ def test_returns_written_paths() -> None:
             project_dir,
             layers={"universal": _UNIVERSAL},
             reviewer_agent=_REVIEWER_AGENT,
-            review_prompt=_REVIEW_PROMPT,
+            skills=_SKILLS,
         )
 
-        assert len(result) == 3
         assert ".github/copilot-instructions.md" in result
         assert ".github/agents/reviewer.agent.md" in result
-        assert ".github/prompts/review.prompt.md" in result
+        for name in _SKILLS:
+            assert f".github/prompts/{name}.prompt.md" in result

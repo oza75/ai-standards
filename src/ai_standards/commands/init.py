@@ -31,17 +31,11 @@ def run(
         languages = languages - {"typescript"}
 
     layers = store.assemble_layers(languages)
+    skills = store.get_skills()
 
     written: list[str] = []
-    written.extend(ClaudeCodeAdapter.run(project_dir, layers))
-    written.extend(
-        CursorAdapter.run(
-            project_dir,
-            layers,
-            skill_plan_task=store.get_content("content/skills/plan-task/SKILL.md"),
-            skill_review=store.get_content("content/skills/review/SKILL.md"),
-        )
-    )
+    written.extend(ClaudeCodeAdapter.run(project_dir, layers, skills))
+    written.extend(CursorAdapter.run(project_dir, layers, skills))
     written.extend(
         CopilotAdapter.run(
             project_dir,
@@ -49,7 +43,7 @@ def run(
             reviewer_agent=store.get_content(
                 "content/copilot/agents/reviewer.agent.md"
             ),
-            review_prompt=store.get_content("content/skills/review/SKILL.md"),
+            skills=skills,
         )
     )
 

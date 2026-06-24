@@ -27,17 +27,13 @@ def run(
         )
         languages = languages - {"typescript"}
     layers = store.assemble_layers(languages)
+    skills = store.get_skills()
 
-    ClaudeCodeAdapter.run(project_dir, layers)
-    CursorAdapter.run(
-        project_dir,
-        layers,
-        skill_plan_task=store.get_content("content/skills/plan-task/SKILL.md"),
-        skill_review=store.get_content("content/skills/review/SKILL.md"),
-    )
+    ClaudeCodeAdapter.run(project_dir, layers, skills)
+    CursorAdapter.run(project_dir, layers, skills)
     CopilotAdapter.run(
         project_dir,
         layers,
         reviewer_agent=store.get_content("content/copilot/agents/reviewer.agent.md"),
-        review_prompt=store.get_content("content/skills/review/SKILL.md"),
+        skills=skills,
     )
