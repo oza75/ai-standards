@@ -68,3 +68,17 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - **Trailer:** `Co-Authored-By: Claude <model> <noreply@anthropic.com>`.
 - **Branch:** `<type>/<story-code>-<short-name>`, one branch per story, merged to `main`
   when the story is done.
+
+## Workflow
+
+Every story follows the same lifecycle. Invoke the corresponding skill at each step.
+
+| Step | When | Skill |
+|------|------|-------|
+| Plan | Before writing any code | `plan-task` |
+| Implement | One story at a time | `test-driven-development` |
+| Verify | Before marking a story done | `verification-before-completion` |
+| Review | After verification passes | `reviewer-loop` |
+| Debug | When a test fails unexpectedly | `systematic-debugging` |
+
+The `review` skill runs a single pass inside `reviewer-loop`. Use `reviewer-loop` to reach convergence.

@@ -32,12 +32,12 @@ def run(
     CursorAdapter.run(
         project_dir,
         layers,
-        skill_plan_task=store.get_content("content/cursor/skills/plan-task/SKILL.md"),
-        skill_review=store.get_content("content/cursor/skills/review/SKILL.md"),
+        skill_plan_task=store.get_content("content/skills/plan-task/SKILL.md"),
+        skill_review=store.get_content("content/skills/review/SKILL.md"),
     )
     CopilotAdapter.run(
         project_dir,
         layers,
         reviewer_agent=store.get_content("content/copilot/agents/reviewer.agent.md"),
-        review_prompt=store.get_content("content/copilot/prompts/review.prompt.md"),
+        review_prompt=store.get_content("content/skills/review/SKILL.md"),
     )

@@ -5,9 +5,12 @@
     "layers/universal.md",
     "layers/python.md",
     "layers/typescript.md",
-    "content/cursor/skills/plan-task/SKILL.md",
-    "content/cursor/skills/review/SKILL.md",
-    "content/copilot/agents/reviewer.agent.md",
-    "content/copilot/prompts/review.prompt.md"
+    "content/skills/plan-task/SKILL.md",
+    "content/skills/review/SKILL.md",
+    "content/skills/test-driven-development/SKILL.md",
+    "content/skills/reviewer-loop/SKILL.md",
+    "content/skills/verification-before-completion/SKILL.md",
+    "content/skills/systematic-debugging/SKILL.md",
+    "content/copilot/agents/reviewer.agent.md"
   ]
 }
