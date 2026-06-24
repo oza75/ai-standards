@@ -16,6 +16,7 @@ MANIFEST_PATH = REPO_ROOT / "layers" / "manifest.json"
 
 _SKILL_NAMES = [
     "plan-task",
+    "implement-story",
     "review",
     "test-driven-development",
     "reviewer-loop",

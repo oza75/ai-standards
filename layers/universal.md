@@ -90,10 +90,11 @@ re-review, repeating until no CRITICAL/MAJOR remains. Only then write the story 
 and run `reviewer-loop` once more on what was written. No code is written until this
 converges.
 
-**Coding phase — loop per story until done.** For each story, in dependency order:
-`test-driven-development` (red → green → refactor, one unit at a time, itself a loop) →
-`verification-before-completion` (the full gate green, with the behaviour observed) →
-`reviewer-loop` (repeat until no CRITICAL/MAJOR) → commit → next story.
+**Coding phase — loop per story until done.** Driven by `implement-story`, which takes
+one story at a time in dependency order through: `test-driven-development` (red → green →
+refactor, one unit at a time, itself a loop) → `verification-before-completion` (the full
+gate green, with the behaviour observed) → `reviewer-loop` (repeat until no
+CRITICAL/MAJOR) → commit → next story.
 
 `systematic-debugging` is invoked whenever a test fails for a non-obvious reason — root
 cause before any fix.
@@ -101,7 +102,8 @@ cause before any fix.
 | Phase | Entry skill | Loops until |
 |-------|-------------|-------------|
 | Plan | `plan-task` | story set has no CRITICAL/MAJOR |
-| Code (per story) | `test-driven-development` → `verification-before-completion` → `reviewer-loop` | gate green and review converged |
+| Code (per story) | `implement-story` (nests `test-driven-development` → `verification-before-completion` → `reviewer-loop`) | gate green and review converged |
 | Debug (as needed) | `systematic-debugging` | root cause found, regression test passes |
 
-`review` runs a single pass; `reviewer-loop` runs it to convergence.
+`plan-task` plans only and hands off to `implement-story` to build. `review` runs a
+single pass; `reviewer-loop` runs it to convergence.

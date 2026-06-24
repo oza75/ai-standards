@@ -68,11 +68,12 @@ def test_content_not_in_layer_dict() -> None:
     assert not any(k.startswith("content/") for k in layers)
 
 
-def test_get_skills_returns_all_six() -> None:
+def test_get_skills_returns_all_skills() -> None:
     store, _ = _make_store(_full_store_files())
     skills = store.get_skills()
     expected = {
         "plan-task",
+        "implement-story",
         "review",
         "test-driven-development",
         "reviewer-loop",

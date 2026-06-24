@@ -1,15 +1,17 @@
 ---
 name: plan-task
-description: Turn a goal into shipped, tested code — decompose into reviewer-converged user stories, then implement story by story. The master process that nests the other skills.
+description: Use before any code is written — decompose a goal into reviewer-converged user stories and write the story files. Planning only; hand off to implement-story to build them.
 ---
 
 # plan-task
 
-The master process for turning a goal into shipped, tested code. Every task is
-decomposed into **user stories** and built **test-first**. This skill nests
-`test-driven-development`, `systematic-debugging`, `verification-before-completion`,
-and `reviewer-loop`. Never bulk-implement; never write code on the fly or
-half-finished.
+The **planning** half of the lifecycle: turn a goal into a reviewer-converged set
+of written user stories, built to be implemented **test-first**. This skill stops
+at a plan — it does not write production code. When the stories are converged and
+written, hand off to `implement-story` to build them.
+
+Planning is a **loop**: propose → review → revise, until the decomposition
+converges. Write no story files, and no code, before the story set converges.
 
 ## Phase 1 — Scope
 
@@ -47,20 +49,11 @@ built test-first.
 Run `reviewer-loop` on the written stories — acceptance criteria, test lists,
 key files, against the project's standards. Loop to convergence.
 
-## Phase 7 — Implement story by story
+## Done — hand off to implementation
 
-For each story, in dependency order:
-
-1. Branch `<type>/[CODE]-[N]-[short]`; set the story `status: progress`.
-2. Run `test-driven-development`: write the story's tests (red, watched to
-   fail) → minimal code to green → refactor — one unit at a time, never bulk.
-3. Run `verification-before-completion`: the full gate green **and** the
-   behaviour observed.
-4. Run `reviewer-loop` on the **code**; address CRITICAL/MAJOR to convergence.
-5. Set `status: done`, `completed: <datetime>`; commit (Conventional Commits,
-   referencing the story code); merge.
-
-Use `systematic-debugging` whenever a test fails for a non-obvious reason.
+Planning is complete when the stories are written and reviewer-converged. Do
+**not** start coding here. Hand off to `implement-story`, which takes the stories
+one at a time through the coding loop (TDD → verification → review → commit).
 
 ## File formats
 
@@ -107,7 +100,8 @@ Functional:
 
 ## Rules
 
-- Do not start coding until the stories are reviewer-converged.
+- This skill plans only. It never writes production code — that is `implement-story`.
+- Do not write story files until the story set is reviewer-converged.
 - Every story must be independently implementable with `test-driven-development`.
 - Dependency order is explicit in `TASK.md`.
 - A story that generates more than ~6 reviewer findings is too large — split it.
