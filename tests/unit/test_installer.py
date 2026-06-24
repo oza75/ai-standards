@@ -1,5 +1,6 @@
 import tempfile
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -127,3 +128,96 @@ def test_all_expected_files_present_after_success() -> None:
             Installer.run(MANIFEST, store_dir)
         for rel in MANIFEST.files:
             assert (store_dir / rel).exists()
+
+
+def test_rename_failure_rolls_back_store_dir() -> None:
+    """If staging.rename(store_dir) raises, original store_dir is restored."""
+    with tempfile.TemporaryDirectory() as tmp:
+        store_dir = Path(tmp) / ".ai-standards"
+        (store_dir / "layers").mkdir(parents=True)
+        (store_dir / "layers" / "universal.md").write_bytes(b"original")
+
+        original_rename = Path.rename
+        rename_calls: list[Any] = []
+
+        def tracked_rename(self: Path, target: Path) -> Path:
+            rename_calls.append(self)
+            if len(rename_calls) == 2:
+                raise OSError("simulated rename failure")
+            return original_rename(self, target)
+
+        mock_client = _make_http_mock(b"new content")
+        with patch("ai_standards.installer.httpx.Client", return_value=mock_client):
+            with patch.object(Path, "rename", tracked_rename):
+                with pytest.raises(OSError):
+                    Installer.run(MANIFEST, store_dir)
+
+        assert (store_dir / "layers" / "universal.md").read_bytes() == b"original"
+        assert not Path(str(store_dir) + ".old").exists()
+        assert not Path(str(store_dir) + ".staging").exists()
+
+
+def test_recovery_from_crashed_rename_phase() -> None:
+    """If a prior run left old_dir but no store_dir, the next run recovers."""
+    with tempfile.TemporaryDirectory() as tmp:
+        store_dir = Path(tmp) / ".ai-standards"
+        old_dir = Path(str(store_dir) + ".old")
+
+        # Simulate crashed state: old_dir has prior canonical, store_dir is absent
+        (old_dir / "layers").mkdir(parents=True)
+        (old_dir / "layers" / "universal.md").write_bytes(b"prior content")
+
+        mock_client = _make_http_mock(b"new content")
+        with patch("ai_standards.installer.httpx.Client", return_value=mock_client):
+            Installer.run(MANIFEST, store_dir)
+
+        assert (store_dir / "layers" / "universal.md").read_bytes() == b"new content"
+        assert not old_dir.exists()
+
+
+def test_recovery_prefers_complete_staging_when_both_staging_and_old_exist() -> None:
+    """If old_dir + staging both present without store_dir, staging is promoted."""
+    with tempfile.TemporaryDirectory() as tmp:
+        store_dir = Path(tmp) / ".ai-standards"
+        old_dir = Path(str(store_dir) + ".old")
+        staging_dir = Path(str(store_dir) + ".staging")
+
+        (old_dir / "layers").mkdir(parents=True)
+        (old_dir / "layers" / "universal.md").write_bytes(b"prior content")
+        (staging_dir / "layers").mkdir(parents=True)
+        (staging_dir / "layers" / "universal.md").write_bytes(b"staged content")
+
+        mock_client = _make_http_mock(b"fresh content")
+        with patch("ai_standards.installer.httpx.Client", return_value=mock_client):
+            Installer.run(MANIFEST, store_dir)
+
+        assert (store_dir / "layers" / "universal.md").read_bytes() == b"fresh content"
+        assert not old_dir.exists()
+        assert not staging_dir.exists()
+
+
+def test_first_rename_failure_cleans_staging() -> None:
+    """If the first rename fails, store_dir is preserved and staging is cleaned."""
+    with tempfile.TemporaryDirectory() as tmp:
+        store_dir = Path(tmp) / ".ai-standards"
+        (store_dir / "layers").mkdir(parents=True)
+        (store_dir / "layers" / "universal.md").write_bytes(b"original")
+
+        original_rename = Path.rename
+        rename_calls: list[Any] = []
+
+        def tracked_rename(self: Path, target: Path) -> Path:
+            rename_calls.append(self)
+            if len(rename_calls) == 1:
+                raise OSError("simulated first rename failure")
+            return original_rename(self, target)
+
+        mock_client = _make_http_mock(b"new content")
+        with patch("ai_standards.installer.httpx.Client", return_value=mock_client):
+            with patch.object(Path, "rename", tracked_rename):
+                with pytest.raises(OSError):
+                    Installer.run(MANIFEST, store_dir)
+
+        assert (store_dir / "layers" / "universal.md").read_bytes() == b"original"
+        assert not Path(str(store_dir) + ".old").exists()
+        assert not Path(str(store_dir) + ".staging").exists()
