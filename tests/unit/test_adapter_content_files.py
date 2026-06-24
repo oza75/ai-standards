@@ -3,12 +3,9 @@ from typing import Any
 
 import yaml
 
-CONTENT_DIR = Path(__file__).parent.parent.parent / "content"
+from ai_standards.adapters.copilot import REVIEWER_AGENT_TOOLS
 
-# Pinned from pre-coding gate: GitHub Copilot bare-name tool reference,
-# retrieved 2026-06-24 (https://docs.github.com/en/copilot/reference/custom-agents-configuration).
-# Authoritative over VS Code namespaced format for .github/agents/*.agent.md files.
-REVIEWER_AGENT_TOOLS: list[str] = ["read", "search"]
+CONTENT_DIR = Path(__file__).parent.parent.parent / "content"
 
 
 def _parse_frontmatter(path: Path) -> dict[str, Any]:
