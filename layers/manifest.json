@@ -1,0 +1,13 @@
+{
+  "repo_url": "https://github.com/oza/ai-standards",
+  "version_ref": "main",
+  "files": [
+    "layers/universal.md",
+    "layers/python.md",
+    "layers/typescript.md",
+    "content/cursor/skills/plan-task/SKILL.md",
+    "content/cursor/skills/review/SKILL.md",
+    "content/copilot/agents/reviewer.agent.md",
+    "content/copilot/prompts/review.prompt.md"
+  ]
+}
