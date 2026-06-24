@@ -89,10 +89,10 @@ def test_reviewer_agent_tools_are_verified_list() -> None:
     assert fm.get("tools") == REVIEWER_AGENT_TOOLS
 
 
-def test_claude_code_reviewer_subagent_is_read_only_opus() -> None:
-    path = CONTENT_DIR / "claude" / "agents" / "code-reviewer.md"
+def test_claude_reviewer_subagent_is_read_only_opus() -> None:
+    path = CONTENT_DIR / "claude" / "agents" / "reviewer.md"
     fm = _parse_frontmatter(path)
-    assert fm.get("name") == "code-reviewer"
+    assert fm.get("name") == "reviewer"
     assert fm.get("model") == "claude-opus-4-8"
     tools = str(fm.get("tools", "")).lower()
     assert "write" not in tools and "edit" not in tools, "reviewer must be read-only"

@@ -1,17 +1,22 @@
 ---
 name: review
-description: Use for a single code-review pass over a diff or changeset — an independent, skeptical, read-only review that finds correctness bugs and cleanup opportunities, graded by severity with file:line evidence. Run inside reviewer-loop to reach convergence.
+description: Use for a single independent, skeptical, read-only review pass — of a code change OR a plan/story set. Find what is wrong, missing, or unjustified, graded by severity with file:line evidence. Run inside reviewer-loop to reach convergence.
 ---
 
 # review
 
-One review pass over the change in scope. The job is to **find what is wrong,
-missing, or unjustified** before it ships — not to validate or encourage. A
-review that only says "looks good" has failed. Run this inside `reviewer-loop`
-to iterate to convergence; on Claude Code it runs as the `code-reviewer`
-subagent (read-only, claude-opus-4-8).
+One review pass over the artifact in scope — **a code change or a plan/story
+set**. The job is to **find what is wrong, missing, or unjustified** before it
+ships (code) or before any code is written (plan) — not to validate or
+encourage. A review that only says "looks good" has failed. Run this inside
+`reviewer-loop` to iterate to convergence; on Claude Code it runs as the
+`reviewer` subagent (read-only, claude-opus-4-8).
 
-## What to review — start from the diff
+First decide which kind of artifact is in scope, then apply the matching
+checklist below. The disposition, severity labels, and output format are the
+same for both.
+
+## Reviewing a code change
 
 Review the **changed code** (the diff / the changeset for the story), not the
 whole repository. Read each hunk in the context of the file around it. Look in
@@ -26,6 +31,28 @@ two directions:
    obvious inefficiencies. Propose the simplification; do not demand
    gold-plating.
 
+Then run the code checklist below.
+
+## Reviewing a plan or story set
+
+When the artifact is a task decomposition — a proposed story set, or the written
+story files from `plan-task` — challenge the **plan**, not any code (there is
+none yet). Check:
+
+- **Coverage and necessity** — do the stories fully deliver the task's intent,
+  with no gap, and no story earning its place only by habit?
+- **Boundaries and sizing** — is each story a single coherent increment,
+  buildable and verifiable on its own, neither so large it hides concerns nor so
+  small it fragments one?
+- **Independence and ordering** — are the dependencies real, acyclic, and
+  sequenced so each story starts only once its predecessors are done?
+- **Testability** — can each story's claim be settled by the tests it names, and
+  are those tests ones that would actually catch a failure that matters?
+- **Honest acceptance criteria** — do they describe observable behaviour the
+  story must exhibit, rather than the implementation it happens to use?
+
+A finding here points to the story (by code or file), not a line of source.
+
 ## Disposition
 
 - **Skeptical by default.** Assume the author may be fooling themselves. Seek
@@ -38,7 +65,7 @@ two directions:
 - **Honest about limits.** If you cannot verify something, mark it QUESTION.
   Never guess, never pad.
 
-## What to check
+## Code checklist
 
 - **Intent fidelity** — does the change compute what the story requires,
   including at boundaries and edge cases?

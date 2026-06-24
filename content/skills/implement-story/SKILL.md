@@ -32,8 +32,8 @@ is not yet planned and reviewer-converged, stop and run `plan-task` first.
    real run of the feature). A partial pass is not done.
 
 5. **Review to convergence.** Run `reviewer-loop` on the code — delegating each
-   pass to the `code-reviewer` subagent — until no CRITICAL or MAJOR findings
-   remain. Address every blocking finding.
+   pass to the `reviewer` subagent — until no CRITICAL or MAJOR findings remain.
+   Address every blocking finding.
 
 6. **Finish.** Set `status: done`, `completed: <datetime>`; commit with a
    Conventional Commit referencing the story code; merge.

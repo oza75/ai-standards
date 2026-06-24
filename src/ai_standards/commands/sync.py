@@ -35,7 +35,7 @@ def run(
         project_dir,
         layers,
         skills,
-        reviewer_agent=store.get_content("content/claude/agents/code-reviewer.md"),
+        reviewer_agent=store.get_content("content/claude/agents/reviewer.md"),
     )
     CursorAdapter.run(project_dir, layers, skills)
     CopilotAdapter.run(

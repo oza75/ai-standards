@@ -12,9 +12,9 @@ findings**. One clean-looking pass is never "done" — it can be a fluke.
 This skill wraps the `review` skill with the loop discipline. Each pass runs as
 an **independent reviewer**, always on **claude-opus-4-8**:
 
-- On **Claude Code**, delegate each pass to the `code-reviewer` subagent (defined
-  in `.claude/agents/`) — it is read-only, runs on claude-opus-4-8, and applies
-  the `review` skill in an isolated context.
+- On **Claude Code**, delegate each pass to the `reviewer` subagent (defined in
+  `.claude/agents/`) — it is read-only, runs on claude-opus-4-8, and applies the
+  `review` skill (to code or to a plan) in an isolated context.
 - On **GitHub Copilot**, use the `reviewer` custom agent (`.github/agents/`).
 - On **Cursor** (no file-based subagent), run the `review` skill directly.
 

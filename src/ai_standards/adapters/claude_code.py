@@ -40,9 +40,7 @@ class ClaudeCodeAdapter:
         if reviewer_agent is not None:
             agents_dir = project_dir / ".claude" / "agents"
             agents_dir.mkdir(parents=True, exist_ok=True)
-            (agents_dir / "code-reviewer.md").write_text(
-                reviewer_agent, encoding="utf-8"
-            )
-            written.append(".claude/agents/code-reviewer.md")
+            (agents_dir / "reviewer.md").write_text(reviewer_agent, encoding="utf-8")
+            written.append(".claude/agents/reviewer.md")
 
         return written

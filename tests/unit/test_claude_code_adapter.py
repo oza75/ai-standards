@@ -17,8 +17,8 @@ _SKILLS = {
     },
 }
 _REVIEWER_AGENT = (
-    "---\nname: code-reviewer\ntools: Read, Grep, Glob, Bash\n"
-    "model: claude-opus-4-8\nskills: review\n---\n\n# code-reviewer\n"
+    "---\nname: reviewer\ntools: Read, Grep, Glob, Bash\n"
+    "model: claude-opus-4-8\nskills: review\n---\n\n# reviewer\n"
 )
 
 
@@ -163,7 +163,7 @@ def test_deploys_reviewer_subagent() -> None:
             reviewer_agent=_REVIEWER_AGENT,
         )
 
-        agent = project_dir / ".claude" / "agents" / "code-reviewer.md"
+        agent = project_dir / ".claude" / "agents" / "reviewer.md"
         assert agent.exists()
         assert agent.read_text(encoding="utf-8") == _REVIEWER_AGENT
 
@@ -179,7 +179,7 @@ def test_reviewer_subagent_in_return_paths() -> None:
             reviewer_agent=_REVIEWER_AGENT,
         )
 
-        assert ".claude/agents/code-reviewer.md" in result
+        assert ".claude/agents/reviewer.md" in result
 
 
 def test_no_reviewer_subagent_when_omitted() -> None:

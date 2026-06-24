@@ -34,7 +34,7 @@ def run(
     layers = store.assemble_layers(languages)
     skills = store.get_skills()
 
-    claude_reviewer = store.get_content("content/claude/agents/code-reviewer.md")
+    claude_reviewer = store.get_content("content/claude/agents/reviewer.md")
     copilot_reviewer = store.get_content("content/copilot/agents/reviewer.agent.md")
 
     written: list[str] = []

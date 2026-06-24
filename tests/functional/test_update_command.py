@@ -22,7 +22,7 @@ _TEST_MANIFEST = Manifest(
         "content/skills/reviewer-loop/SKILL.md",
         "content/skills/verification-before-completion/SKILL.md",
         "content/skills/systematic-debugging/SKILL.md",
-        "content/claude/agents/code-reviewer.md",
+        "content/claude/agents/reviewer.md",
         "content/copilot/agents/reviewer.agent.md",
     ],
     repo_url="https://github.com/oza/ai-standards",
