@@ -13,23 +13,13 @@ _SKILLS = {
 }
 
 
-def test_writes_agents_md() -> None:
+def test_does_not_write_agents_md() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
         ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
 
-        assert (project_dir / "AGENTS.md").exists()
-
-
-def test_agents_md_has_universal_content() -> None:
-    with tempfile.TemporaryDirectory() as tmp:
-        project_dir = Path(tmp)
-
-        ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
-
-        content = (project_dir / "AGENTS.md").read_text(encoding="utf-8")
-        assert _UNIVERSAL in content
+        assert not (project_dir / "AGENTS.md").exists()
 
 
 def test_claude_local_starts_with_agents_import() -> None:
@@ -114,13 +104,13 @@ def test_command_content_matches_skill() -> None:
             assert cmd == skill_content
 
 
-def test_returns_agents_md_and_commands_dir() -> None:
+def test_returns_claude_local_and_commands_dir() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp)
 
         result = ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
 
-        assert "AGENTS.md" in result
+        assert "AGENTS.md" not in result
         assert "CLAUDE.local.md" in result
         assert ".claude/commands/" in result
 
@@ -153,10 +143,12 @@ def test_rerun_overwrites_cleanly() -> None:
         layers = {"universal": _UNIVERSAL, "python": _PYTHON}
 
         ClaudeCodeAdapter.run(project_dir, layers, _SKILLS)
-        agents_first = (project_dir / "AGENTS.md").read_bytes()
         claude_first = (project_dir / "CLAUDE.local.md").read_bytes()
+        cmd_first = (project_dir / ".claude" / "commands" / "review.md").read_bytes()
 
         ClaudeCodeAdapter.run(project_dir, layers, _SKILLS)
 
-        assert (project_dir / "AGENTS.md").read_bytes() == agents_first
         assert (project_dir / "CLAUDE.local.md").read_bytes() == claude_first
+        assert (
+            project_dir / ".claude" / "commands" / "review.md"
+        ).read_bytes() == cmd_first

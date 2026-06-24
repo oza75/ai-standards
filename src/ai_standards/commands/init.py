@@ -5,6 +5,7 @@ import typer
 from ai_standards.adapters.claude_code import ClaudeCodeAdapter
 from ai_standards.adapters.copilot import CopilotAdapter
 from ai_standards.adapters.cursor import CursorAdapter
+from ai_standards.adapters.shared import SharedAdapter
 from ai_standards.detector import detect_languages
 from ai_standards.gitignore import GitignoreManager
 from ai_standards.store import CanonicalStore, NotInstalledError
@@ -34,6 +35,7 @@ def run(
     skills = store.get_skills()
 
     written: list[str] = []
+    written.extend(SharedAdapter.run(project_dir, layers))
     written.extend(ClaudeCodeAdapter.run(project_dir, layers, skills))
     written.extend(CursorAdapter.run(project_dir, layers, skills))
     written.extend(

@@ -2,16 +2,20 @@ from pathlib import Path
 
 
 class ClaudeCodeAdapter:
+    """Deploys Claude Code's native files.
+
+    Claude Code reads `CLAUDE.local.md` (gitignored personal layer) and skills
+    under `.claude/commands/`. It does not read `AGENTS.md` natively, so the
+    universal layer is pulled in via the `@AGENTS.md` import directive on the
+    first line of CLAUDE.local.md. `AGENTS.md` itself is written by SharedAdapter.
+    """
+
     @staticmethod
     def run(
         project_dir: Path,
         layers: dict[str, str],
         skills: dict[str, str],
     ) -> list[str]:
-        (project_dir / "AGENTS.md").write_text(
-            layers.get("universal", ""), encoding="utf-8"
-        )
-
         lang_layers = [layers[k] for k in sorted(k for k in layers if k != "universal")]
         parts: list[str] = ["@AGENTS.md"] + [p.rstrip() for p in lang_layers]
         (project_dir / "CLAUDE.local.md").write_text(
@@ -23,4 +27,4 @@ class ClaudeCodeAdapter:
         for name, content in skills.items():
             (commands_dir / f"{name}.md").write_text(content, encoding="utf-8")
 
-        return ["AGENTS.md", "CLAUDE.local.md", ".claude/commands/"]
+        return ["CLAUDE.local.md", ".claude/commands/"]

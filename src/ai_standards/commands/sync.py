@@ -5,6 +5,7 @@ import typer
 from ai_standards.adapters.claude_code import ClaudeCodeAdapter
 from ai_standards.adapters.copilot import CopilotAdapter
 from ai_standards.adapters.cursor import CursorAdapter
+from ai_standards.adapters.shared import SharedAdapter
 from ai_standards.detector import detect_languages
 from ai_standards.store import CanonicalStore, NotInstalledError
 
@@ -29,6 +30,7 @@ def run(
     layers = store.assemble_layers(languages)
     skills = store.get_skills()
 
+    SharedAdapter.run(project_dir, layers)
     ClaudeCodeAdapter.run(project_dir, layers, skills)
     CursorAdapter.run(project_dir, layers, skills)
     CopilotAdapter.run(
