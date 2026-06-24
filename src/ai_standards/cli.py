@@ -1,6 +1,14 @@
+import importlib.resources
+from pathlib import Path
+
 import typer
 
+from ai_standards.installer import Installer
+from ai_standards.manifest import ManifestError, load_manifest
+
 app = typer.Typer(no_args_is_help=True)
+
+_STORE_DIR = Path.home() / ".ai-standards"
 
 
 @app.callback()
@@ -11,4 +19,19 @@ def main() -> None:
 @app.command()
 def install() -> None:
     """Download canonical layer files from GitHub to ~/.ai-standards/."""
-    raise NotImplementedError("install command not yet implemented — run STD-6")
+    ref = importlib.resources.files("ai_standards") / "manifest.json"
+    with importlib.resources.as_file(ref) as manifest_path:
+        try:
+            manifest = load_manifest(manifest_path)
+        except ManifestError as exc:
+            typer.echo(f"Error: {exc}", err=True)
+            raise typer.Exit(1)
+
+    typer.echo("Installing ai-standards…")
+    try:
+        Installer.run(manifest, _STORE_DIR)
+    except Exception as exc:
+        typer.echo(f"Install failed: {exc}", err=True)
+        raise typer.Exit(1)
+
+    typer.echo(f"Installed to {_STORE_DIR}")
