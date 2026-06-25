@@ -7,7 +7,7 @@ standards across Claude Code, Cursor, and VS Code Copilot. Keeps a
 canonical set of layer files in `~/.ai-standards/` and deploys them
 per-project (gitignored) in each tool's native format.
 
-Install: `uv tool install git+https://github.com/oza/ai-standards`
+Install: `uv tool install git+https://github.com/oza75/ai-standards`
 
 ## How we work — the lifecycle
 
