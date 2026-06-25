@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from ai_standards.mcp import context7_server, merge_mcp_server
+
 
 class CursorAdapter:
     @staticmethod
@@ -24,5 +26,13 @@ class CursorAdapter:
             mdc = "---\nalwaysApply: true\n---\n\n" + layers["python"]
             (rules_dir / "python.mdc").write_text(mdc, encoding="utf-8")
             written.append(".cursor/rules/python.mdc")
+
+        merge_mcp_server(
+            project_dir / ".cursor" / "mcp.json",
+            "mcpServers",
+            "context7",
+            context7_server(include_type=False),
+        )
+        written.append(".cursor/mcp.json")
 
         return written

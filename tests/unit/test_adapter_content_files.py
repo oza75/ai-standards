@@ -12,6 +12,7 @@ MANIFEST_PATH = LAYERS_DIR / "manifest.json"
 SKILL_NAMES = [
     "plan-task",
     "implement-story",
+    "read-docs",
     "review",
     "test-driven-development",
     "reviewer-loop",

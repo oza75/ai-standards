@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from ai_standards.mcp import context7_server, merge_mcp_server
+
 # Pinned from pre-coding gate: GitHub Copilot bare-name tool reference,
 # retrieved 2026-06-24 (https://docs.github.com/en/copilot/reference/custom-agents-configuration).
 # Authoritative over VS Code namespaced format for .github/agents/*.agent.md files.
@@ -41,5 +43,15 @@ class CopilotAdapter:
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_text(content, encoding="utf-8")
                 written.append(f".github/skills/{name}/{inner}")
+
+        # VS Code uses the top-level key `servers` (not `mcpServers`) and requires
+        # `type` on each entry.
+        merge_mcp_server(
+            project_dir / ".vscode" / "mcp.json",
+            "servers",
+            "context7",
+            context7_server(include_type=True),
+        )
+        written.append(".vscode/mcp.json")
 
         return written

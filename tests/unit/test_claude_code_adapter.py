@@ -1,3 +1,4 @@
+import json
 import tempfile
 from pathlib import Path
 
@@ -189,6 +190,37 @@ def test_no_reviewer_subagent_when_omitted() -> None:
         ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
 
         assert not (project_dir / ".claude" / "agents").exists()
+
+
+def test_deploys_context7_mcp_config() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        result = ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
+
+        mcp = project_dir / ".mcp.json"
+        assert mcp.exists()
+        data = json.loads(mcp.read_text(encoding="utf-8"))
+        ctx = data["mcpServers"]["context7"]
+        assert ctx["command"] == "npx"
+        assert ctx["args"] == ["-y", "@upstash/context7-mcp"]
+        assert ctx["type"] == "stdio"
+        assert ".mcp.json" in result
+
+
+def test_mcp_config_preserves_existing_servers() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+        (project_dir / ".mcp.json").write_text(
+            json.dumps({"mcpServers": {"other": {"command": "foo"}}}),
+            encoding="utf-8",
+        )
+
+        ClaudeCodeAdapter.run(project_dir, {"universal": _UNIVERSAL}, _SKILLS)
+
+        data = json.loads((project_dir / ".mcp.json").read_text(encoding="utf-8"))
+        assert data["mcpServers"]["other"] == {"command": "foo"}
+        assert "context7" in data["mcpServers"]
 
 
 def test_does_not_touch_committed_claude_md() -> None:

@@ -1,3 +1,4 @@
+import json
 import tempfile
 from pathlib import Path
 
@@ -131,6 +132,23 @@ def test_deploys_supporting_files() -> None:
             / "test-driven-development"
             / "testing-anti-patterns.md"
         ).exists()
+
+
+def test_deploys_context7_mcp_config() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp)
+
+        result = CursorAdapter.run(
+            project_dir, layers={"universal": _UNIVERSAL}, skills=_SKILLS
+        )
+
+        mcp = project_dir / ".cursor" / "mcp.json"
+        assert mcp.exists()
+        data = json.loads(mcp.read_text(encoding="utf-8"))
+        ctx = data["mcpServers"]["context7"]
+        assert ctx["command"] == "npx"
+        assert "type" not in ctx
+        assert ".cursor/mcp.json" in result
 
 
 def test_gitignore_not_touched() -> None:

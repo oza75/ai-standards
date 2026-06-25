@@ -26,7 +26,9 @@ on its own.
    criterion, write one failing test → watch it fail for the right reason →
    minimal code to pass → refactor on green. Work one unit at a time. Batching the
    code and back-filling tests afterward defeats the point — the failing test is
-   what proves the code is wired up and the assertion actually bites.
+   what proves the code is wired up and the assertion actually bites. Before
+   writing against an external library or API, use `read-docs` to pull its
+   current, version-correct docs — write to the real API, not to memory.
 
 3. **Debug systematically when needed.** When a test fails for a non-obvious
    reason, switch to `systematic-debugging` and find the root cause before any

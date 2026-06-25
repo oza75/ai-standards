@@ -31,6 +31,11 @@ anything new — a plan that ignores what is already there proposes redundant wo
 Note what must stay untouched: invariants, guardrails, data that must not be
 modified.
 
+When the task involves an external library, framework, or API, use `read-docs`
+to pull its **current** documentation now — before you propose an approach. A
+plan built on a remembered (and possibly outdated or version-wrong) API bakes in
+work that will not survive contact with the real library.
+
 ## Phase 3 — Propose the story set (no files yet)
 
 Draft the candidate stories: title, a one-line "As a / I want / so that", the

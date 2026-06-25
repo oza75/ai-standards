@@ -49,6 +49,17 @@ never scattered through the source. Reviews and research are **loops, not one pa
 prompts to a reviewer are **neutral** — state the artifact and ask what is wrong, never
 state the answer you hope for (a leading prompt produces confirmation, not signal).
 
+## Documentation
+
+When you use, choose, or design against an external library, framework, or API,
+retrieve its current, version-correct documentation with the `read-docs` skill (backed
+by Context7) **before** deciding or writing code against it. Training memory is often
+stale or version-wrong — hallucinated APIs and outdated signatures are a leading cause of
+bad code. The retrieved docs are ground truth; when they conflict with memory, the docs
+win. This applies in **both phases**: while planning an approach and while writing the
+code. Retrieve correctly — the right library, the version the project actually pins, and a
+query for the specific thing you need.
+
 ## Tests
 
 Plan the tests and have the reviewer challenge them **before** writing them. Then drive
@@ -106,4 +117,6 @@ cause before any fix.
 | Debug (as needed) | `systematic-debugging` | root cause found, regression test passes |
 
 `plan-task` plans only and hands off to `implement-story` to build. `review` runs a
-single pass; `reviewer-loop` runs it to convergence.
+single pass; `reviewer-loop` runs it to convergence. `read-docs` runs across both phases
+— consult current library/API docs (Context7) before planning an approach or writing
+against a dependency.

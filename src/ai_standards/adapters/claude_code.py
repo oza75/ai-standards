@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from ai_standards.mcp import context7_server, merge_mcp_server
+
 
 class ClaudeCodeAdapter:
     """Deploys Claude Code's native files.
@@ -42,5 +44,13 @@ class ClaudeCodeAdapter:
             agents_dir.mkdir(parents=True, exist_ok=True)
             (agents_dir / "reviewer.md").write_text(reviewer_agent, encoding="utf-8")
             written.append(".claude/agents/reviewer.md")
+
+        merge_mcp_server(
+            project_dir / ".mcp.json",
+            "mcpServers",
+            "context7",
+            context7_server(include_type=True),
+        )
+        written.append(".mcp.json")
 
         return written

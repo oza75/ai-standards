@@ -74,6 +74,7 @@ def test_get_skills_returns_all_skills() -> None:
     expected = {
         "plan-task",
         "implement-story",
+        "read-docs",
         "review",
         "test-driven-development",
         "reviewer-loop",

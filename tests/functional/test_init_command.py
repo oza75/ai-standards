@@ -17,6 +17,7 @@ MANIFEST_PATH = REPO_ROOT / "layers" / "manifest.json"
 _SKILL_NAMES = [
     "plan-task",
     "implement-story",
+    "read-docs",
     "review",
     "test-driven-development",
     "reviewer-loop",
@@ -37,6 +38,9 @@ _SKILL_INNER = {
     name: ["SKILL.md", *_SUPPORTING_FILES.get(name, [])] for name in _SKILL_NAMES
 }
 
+# MCP config files (Context7) — one per tool, different paths/keys
+_MCP_FILES = [".mcp.json", ".cursor/mcp.json", ".vscode/mcp.json"]
+
 # Files that must exist on disk after init
 _EXPECTED_DEPLOYED_FILES = (
     ["AGENTS.md", "CLAUDE.local.md", ".claude/agents/reviewer.md"]
@@ -44,6 +48,7 @@ _EXPECTED_DEPLOYED_FILES = (
     + [f".cursor/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
     + [f".github/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
+    + _MCP_FILES
 )
 
 # Entries that must appear in .gitignore
@@ -53,6 +58,7 @@ _EXPECTED_GITIGNORE_ENTRIES = (
     + [f".cursor/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
     + [".github/copilot-instructions.md", ".github/agents/reviewer.agent.md"]
     + [f".github/skills/{n}/{f}" for n in _SKILL_NAMES for f in _SKILL_INNER[n]]
+    + _MCP_FILES
 )
 
 
