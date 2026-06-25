@@ -27,6 +27,7 @@ _SKILL_NAMES = [
 # Supporting (progressive-disclosure) files per skill, relative to the skill dir.
 # These deploy to Claude Code and Cursor but NOT to Copilot (single .prompt.md).
 _SUPPORTING_FILES = {
+    "plan-task": ["references/story-templates.md"],
     "test-driven-development": ["testing-anti-patterns.md"],
     "systematic-debugging": ["root-cause-tracing.md", "defense-in-depth.md"],
 }
