@@ -31,10 +31,13 @@ anything new — a plan that ignores what is already there proposes redundant wo
 Note what must stay untouched: invariants, guardrails, data that must not be
 modified.
 
-When the task involves an external library, framework, or API, use `read-docs`
-to pull its **current** documentation now — before you propose an approach. A
-plan built on a remembered (and possibly outdated or version-wrong) API bakes in
-work that will not survive contact with the real library.
+**Research every external dependency the task touches, now, with `read-docs`** —
+before you propose anything. Pull the current, version-correct docs for each
+library, framework, or API the approach would lean on. A plan built on a
+remembered (and possibly outdated or version-wrong) API bakes in work that will
+not survive contact with the real library, and the failure surfaces later as if
+it were an implementation bug. This is the cheapest place to catch a wrong
+assumption — fix it in the proposal, not in the code.
 
 ## Phase 3 — Propose the story set (no files yet)
 
@@ -76,6 +79,8 @@ one at a time through the coding loop (TDD → verification → review → commi
 ## Rules
 
 - This skill plans only. It never writes production code — that is `implement-story`.
+- Research every external dependency with `read-docs` before proposing the
+  approach. Never plan against a remembered API.
 - Do not write story files until the story set is reviewer-converged.
 - Every story must be independently implementable with `test-driven-development`.
 - Dependency order is explicit in `TASK.md`.

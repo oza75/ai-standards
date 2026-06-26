@@ -5,19 +5,33 @@ LAYERS_DIR = Path(__file__).parent.parent.parent / "layers"
 
 def test_universal_has_required_sections() -> None:
     text = (LAYERS_DIR / "universal.md").read_text(encoding="utf-8")
-    for heading in ("## Naming", "## Docs", "## Structure", "## Tests", "## Git"):
+    for heading in (
+        "## Naming",
+        "## Docs",
+        "## Design",
+        "## Performance",
+        "## Research",
+        "## Tests",
+        "## Git",
+    ):
         assert heading in text, f"universal.md missing section: {heading}"
 
 
 def test_python_has_required_sections() -> None:
     text = (LAYERS_DIR / "python.md").read_text(encoding="utf-8")
-    for heading in ("## Typing", "## The _ Prefix", "## Async-Sync", "## Tools"):
+    for heading in (
+        "## Typing",
+        "## The _ Prefix",
+        "## Concurrency & parallelism",
+        "## Performance & memory",
+        "## Tools",
+    ):
         assert heading in text, f"python.md missing section: {heading}"
 
 
 def test_python_sections_absent_from_universal() -> None:
     text = (LAYERS_DIR / "universal.md").read_text(encoding="utf-8")
-    for heading in ("## Typing", "## Async-Sync", "## Tools"):
+    for heading in ("## Typing", "## Concurrency & parallelism", "## Tools"):
         assert heading not in text, f"universal.md should not contain: {heading}"
 
 

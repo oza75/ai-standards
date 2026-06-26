@@ -63,6 +63,11 @@ Once you can see the mechanism, place it in context:
   sites, a type or shape mismatch, an unseeded RNG, an async boundary, a mutable
   default? Check whether the same root cause lurks elsewhere before you fix the
   one spot you found.
+- **Suspect the dependency, not just your code.** When a library returns or
+  behaves differently than you expected, the cause is often a version or API
+  mismatch — the signature changed, a default moved, a method was renamed. Re-read
+  its current docs with `read-docs` at the project's pinned version before
+  assuming the bug is yours. Memory of an old API is a classic false lead.
 
 ## Phase 3 — Hypothesis and testing
 

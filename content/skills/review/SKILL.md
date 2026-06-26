@@ -74,6 +74,18 @@ A finding here points to the story (by code or file), not a line of source.
   were they built test-first (a bug fix carries a regression test)?
 - **Failure behaviour** — does it fail loudly and safely, never silently
   emitting a plausible-but-wrong result?
+- **External APIs verified** — is every call against a library/framework/API one
+  that actually exists at the version the project pins, or could it be a
+  hallucinated or outdated signature? An unverified external call is a finding;
+  the fix direction is to confirm it with `read-docs`.
+- **Design** — is the change modelled with the right structure (objects where
+  there is state or variation, the fitting pattern named, composition over deep
+  inheritance, single responsibility), or bolted on as loose procedural code that
+  will resist extension?
+- **Efficiency** — right algorithm and data structure for the data size; no O(n²)
+  over a real dataset, no whole-dataset materialisation where streaming fits, the
+  appropriate concurrency tool for the bottleneck. Flag knowingly wasteful code,
+  not the absence of premature micro-optimisation.
 - **Standards & craft** — names carry intent, types hold, comments explain the
   *why*, no provisional / on-the-fly / commented-out code — against the
   project's written standards (`AGENTS.md` and the language layer).

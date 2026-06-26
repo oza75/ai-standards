@@ -33,7 +33,9 @@ on its own.
 3. **Debug systematically when needed.** When a test fails for a non-obvious
    reason, switch to `systematic-debugging` and find the root cause before any
    fix, then return to the loop. A patch that makes the symptom disappear without
-   explaining it tends to resurface.
+   explaining it tends to resurface. When a dependency behaves differently than
+   you expected, suspect a version/API mismatch and re-check its current docs
+   with `read-docs` before theorising about your own code.
 
 4. **Verify.** Run `verification-before-completion`: the full gate green in a
    single fresh run **and** the behaviour observed (the functional test, or a real
@@ -53,6 +55,8 @@ on its own.
 
 - One story at a time; one unit at a time within a story.
 - No production code without a failing test first (`test-driven-development`).
+- Before writing any call against an external dependency, verify its current API
+  with `read-docs`. Write to the real, version-correct API — never from memory.
 - A story is done only when the gate is green **and** the review has converged —
   both, freshly verified, not assumed.
 - Respect the dependency order from the task's `TASK.md`; do not start a story

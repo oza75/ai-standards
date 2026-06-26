@@ -22,19 +22,40 @@ Python does not enforce privacy, so a leading `_` is usually noise. Use it only 
 Module-level `_helper` "privacy" is not a reason. If it should not be part of the public
 API, that is a module-boundary question, not a naming question.
 
-## Async-Sync
+## Concurrency & parallelism
 
-Async is for **I/O-bound** work: concurrent API calls, dataset downloads, network
-fan-outs. Use it there — overlapping network waits is real throughput.
+Match the tool to the bottleneck. The GIL means threads do not parallelise pure-Python CPU
+work — pick the wrong mechanism and you get all the complexity of concurrency with none of
+the speedup.
 
-CPU-bound code and computation-bound work stay **synchronous**. Their parallelism comes
-from vectorisation, multiprocessing, or worker pools — not asyncio, which cannot
-parallelise CPU under the GIL.
+- **I/O-bound** (network, disk, API fan-out): overlap the waits. Use `asyncio` for
+  natively-async libraries, or a `ThreadPoolExecutor` (`concurrent.futures`) to run
+  blocking I/O calls concurrently. Overlapping network waits is real throughput.
+- **CPU-bound** (computation, encoding, heavy transforms): parallelise with a
+  `ProcessPoolExecutor` / `multiprocessing`, or push the work into vectorised libraries
+  (NumPy, pandas, PyTorch) that release the GIL and run in native code. Never reach for
+  asyncio or threads to speed up CPU work.
+- Size pools deliberately and reuse them; do not spawn an unbounded number of workers per
+  call. Prefer `concurrent.futures` executors with `as_completed` over hand-rolled
+  thread/process management.
+
+### Async hygiene
 
 - Do not mix sync and async in the same function.
 - Never call `asyncio.run()` inside a function that might itself be running in an event
   loop — use `await` instead.
 - Mark async helpers with `async def`; never use `asyncio.get_event_loop()`.
+
+## Performance & memory
+
+- Stream large data with **generators and iterators**; do not build a full list when you
+  consume it once. Process in chunks rather than loading everything into memory.
+- Reach for the right structure: `set` / `dict` for membership and lookup instead of a
+  linear scan over a list, `collections.deque` for queues, `__slots__` on small objects
+  created in large numbers.
+- Prefer vectorised array operations over element-wise Python loops for numeric work.
+- Profile a hot path with real data (`cProfile`, `timeit`) before optimising it — but
+  write the obviously-efficient form first rather than the naive one and tuning later.
 
 ## Tools
 
